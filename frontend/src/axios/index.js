@@ -2,17 +2,20 @@ import axios from 'axios'
 
 export const axiosEventBus = new EventTarget()
 
-const baseURL = import.meta.env.PROD
-  ? `https://${import.meta.env.VITE_API_URL}/`
-  : `http://${import.meta.env.VITE_API_URL}/`
+// If VITE_API_URL starts with "/", use it as is (relative path)
+// Otherwise add http/https (absolute path)
+const apiPath = import.meta.env.VITE_API_URL || 'localhost:8000';
+
+const baseURL = apiPath.startsWith('/')
+  ? apiPath
+  : `${window.location.protocol}//${apiPath}/`;
 
 const axiosInstance = axios.create({
-  baseURL,
+  baseURL: baseURL.endsWith('/') ? baseURL : `${baseURL}/`, // Ensure trailing slash
   headers: {
     'Content-Type': 'application/json',
   },
 })
-
 
 // Request interceptor: attach access token
 axiosInstance.interceptors.request.use(config => {
