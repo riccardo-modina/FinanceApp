@@ -101,7 +101,6 @@ function close() {
               v-model="form.type"
               :items="[
                 { id: 'conto_corrente', name: 'Conto Corrente' },
-                { id: 'revolut', name: 'Revolut' },
                 { id: 'contanti', name: 'Contanti' }
               ]"
               placeholder="Seleziona tipo"

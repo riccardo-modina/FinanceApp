@@ -44,7 +44,6 @@ class Conto(models.Model):
     # (saved_value, label), value saved in the db, displayed label
     TIPO_CHOICES = [
         ("conto_corrente", "Conto Corrente"),
-        ("revolut", "Revolut"),
         ("contanti", "Contanti"),
     ]
 
