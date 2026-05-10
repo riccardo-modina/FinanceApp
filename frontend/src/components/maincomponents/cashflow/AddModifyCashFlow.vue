@@ -375,25 +375,32 @@ function triggerShake(type) {
 
 function onAmountInput(e) {
   const original = e.target.value
-  const sanitized = original.replace(/[^0-9.]/g, '')
+  let normalized = original.replace(',', '.')
   
-  if (original !== sanitized) {
+  // Detect invalid characters (anything not 0-9 or dot)
+  const hasInvalidChars = /[^0-9.]/.test(normalized)
+  // Detect multiple dots
+  const dotsCount = (normalized.match(/\./g) || []).length
+  const hasMultipleDots = dotsCount > 1
+
+  if (hasInvalidChars || hasMultipleDots) {
     showNumericError.value = true
     triggerShake('amount')
-    displayValue.value = sanitized
+    // Revert the input field value to the last valid state
+    e.target.value = displayValue.value
   } else {
     showNumericError.value = false
-    displayValue.value = original
-  }
+    displayValue.value = normalized
 
-  const parsed = parseFloat(sanitized)
-  if (!isNaN(parsed)) {
-    if (parsed > 10000000) triggerShake('amount')
-    showZeroError.value = (parsed <= 0)
-    form.value.amount = parsed
-  } else {
-    form.value.amount = ''
-    showZeroError.value = false
+    const parsed = parseFloat(normalized)
+    if (!isNaN(parsed)) {
+      if (parsed > 10000000) triggerShake('amount')
+      showZeroError.value = (parsed <= 0)
+      form.value.amount = parsed
+    } else {
+      form.value.amount = ''
+      showZeroError.value = false
+    }
   }
 }
 
@@ -701,10 +708,10 @@ watch(
                       ]"
                     />
                     <div class="flex flex-col mt-1">
-                      <InputError :message="showNumericError ? 'Sono consentiti solo numeri' : ''" type="warning" />
+                      <InputError :message="showNumericError ? 'Sono consentiti solo numeri e un separatore decimale' : ''" type="warning" />
                       <InputError :message="showZeroError ? 'L\'importo deve essere maggiore di zero' : ''" />
                       <InputError :message="form.amount > 10000000 ? 'Limite massimo di 10M superato!' : ''" />
-                      <span class="text-[10px] text-gray-500 mt-0.5">Usa il punto (.) per i decimali.</span>
+                      <span class="text-[10px] text-gray-500 mt-0.5">Usa il punto (.) o la virgola (,) per i decimali.</span>
                     </div>
                     </div>
 
