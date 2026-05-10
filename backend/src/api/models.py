@@ -141,6 +141,7 @@ class Movimento(models.Model):
 
 class GlobalSettings(models.Model):
     allow_registration = models.BooleanField(default=True, help_text="Permetti nuove registrazioni")
+    registration_invite_code = models.CharField(max_length=50, blank=True, null=True, help_text="Codice segreto per la registrazione")
 
     class Meta:
         verbose_name = "Global Settings"

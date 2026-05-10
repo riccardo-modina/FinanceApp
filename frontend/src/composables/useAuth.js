@@ -135,7 +135,7 @@ export function useAuth() {
     axiosEventBus.removeEventListener('auth:logout', handleLogoutEvent)
   })
 
-  const register = async (email, username, password) => {
+  const register = async (email, username, password, inviteCode = null) => {
     try {
       // 1. Generate E2EE keys
       const newMasterKey = generateMasterKey()
@@ -152,7 +152,8 @@ export function useAuth() {
         email,
         password,
         encrypted_master_key: encryptedMasterKey,
-        recovery_encrypted_master_key: recoveryEncryptedKey
+        recovery_encrypted_master_key: recoveryEncryptedKey,
+        invite_code: inviteCode
       })
 
       // Save recovery key to session temporary so Register UI can show it

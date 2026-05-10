@@ -128,8 +128,8 @@ export function getGlobalSettings() {
     return apiRequest('settings/', 'GET');
 }
 
-export function updateRegistrationGlobalSettings(allow_registration) {
-    return apiRequest('settings/', 'PATCH', { allow_registration });
+export function updateRegistrationGlobalSettings(data) {
+    return apiRequest('settings/', 'PATCH', data);
 }
 
 // -------------------- STATISTICS --------------------

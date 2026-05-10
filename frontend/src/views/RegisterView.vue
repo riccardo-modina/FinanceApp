@@ -11,7 +11,9 @@ const password = ref('');
 const showPassword = ref(false);
 const recoveryKey = ref(null);
 const isRegistrationAllowed = ref(true);
+const isInitialized = ref(false);
 const loadingSettings = ref(true);
+const inviteCode = ref('');
 
 const { register, authError } = useAuth();
 
@@ -19,6 +21,7 @@ onMounted(async () => {
     try {
         const settings = await getGlobalSettings();
         isRegistrationAllowed.value = settings.allow_registration;
+        isInitialized.value = settings.is_initialized;
     } catch (e) {
         console.error("Errore caricamento impostazioni:", e);
     } finally {
@@ -30,7 +33,7 @@ const passwordFieldType = computed(() => showPassword.value ? 'text' : 'password
 
 const handleRegister = async () => {
   try {
-    await register(email.value, username.value, password.value);
+    await register(email.value, username.value, password.value, inviteCode.value);
     recoveryKey.value = sessionStorage.getItem('tempRecoveryKey');
   } catch (e) {
     // Handled in useAuth
@@ -42,7 +45,11 @@ const togglePasswordVisibility = () => {
 };
 
 const isFormValid = computed(() => {
-  return username.value.length > 0 && password.value.length > 0 && email.value.length > 0;
+  const basic = username.value.length > 0 && password.value.length > 0 && email.value.length > 0;
+  if (isInitialized.value) {
+    return basic && inviteCode.value.length > 0;
+  }
+  return basic;
 });
 
 </script>
@@ -123,6 +130,19 @@ const isFormValid = computed(() => {
                 :showPassword="showPassword"
                 @toggle="togglePasswordVisibility"
               />
+            </div>
+
+            <div v-if="isInitialized">
+              <label for="inviteCode" class="block text-text font-semibold mb-1">Codice d'Invito</label>
+              <input
+                id="inviteCode"
+                v-model="inviteCode"
+                type="text"
+                placeholder="Inserisci il codice ricevuto dal proprietario"
+                required
+                class="w-full px-4 py-2 rounded-lg border border-neutral bg-primary-clear text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+              <p class="text-xs text-primary-light mt-1">La registrazione è riservata. Chiedi il codice al proprietario dell'app.</p>
             </div>
 
             <button

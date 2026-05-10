@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import { getGlobalSettings, updateRegistrationGlobalSettings } from '../apicalls/apiCalls';
 
 const allowRegistration = ref(true);
+const inviteCode = ref('');
 const loading = ref(true);
 const saving = ref(false);
 const errorMsg = ref(null);
@@ -12,6 +13,7 @@ onMounted(async () => {
     try {
         const settings = await getGlobalSettings();
         allowRegistration.value = settings.allow_registration;
+        inviteCode.value = settings.registration_invite_code || '';
     } catch (e) {
         errorMsg.value = "Impossibile caricare le impostazioni (sei amministratore?)";
         console.error(e);
@@ -25,8 +27,12 @@ const saveSettings = async () => {
     errorMsg.value = null;
     successMsg.value = null;
     try {
-        const settings = await updateRegistrationGlobalSettings(allowRegistration.value);
+        const settings = await updateRegistrationGlobalSettings({
+            allow_registration: allowRegistration.value,
+            registration_invite_code: inviteCode.value
+        });
         allowRegistration.value = settings.allow_registration;
+        inviteCode.value = settings.registration_invite_code || '';
         successMsg.value = "Impostazioni salvate con successo.";
     } catch (e) {
         errorMsg.value = "Errore durante il salvataggio.";
@@ -59,6 +65,19 @@ const saveSettings = async () => {
                         <input type="checkbox" v-model="allowRegistration" class="sr-only peer" :disabled="saving">
                         <div class="w-14 h-7 bg-gray-400 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary"></div>
                     </label>
+                </div>
+
+                <div class="p-5 bg-background border border-menuborder rounded-xl space-y-4">
+                    <div>
+                        <h3 class="text-xl font-semibold text-text">Codice d'Invito</h3>
+                        <p class="text-sm text-gray-400">Inserisci una parola segreta che i tuoi amici dovranno usare per registrarsi (lascia vuoto se non vuoi un codice).</p>
+                    </div>
+                    <input
+                        type="text"
+                        v-model="inviteCode"
+                        placeholder="Es: pizza_con_ananas_no"
+                        class="w-full px-4 py-2 rounded-lg border border-menuborder bg-card-background text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
                 </div>
 
                 <div class="pt-8 flex justify-end gap-4 border-t border-menuborder">

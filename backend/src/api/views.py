@@ -150,6 +150,12 @@ class CustomRegistrationView(APIView):
         if not username or not password or not encrypted_master_key or not recovery_encrypted_master_key:
             return Response({"error": "Campi mancanti."}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Check invite code if not the first user
+        if not is_first_user:
+            invite_code = request.data.get("invite_code")
+            if settings.registration_invite_code and invite_code != settings.registration_invite_code:
+                return Response({"error": "Codice d'invito non valido."}, status=status.HTTP_403_FORBIDDEN)
+
         if User.objects.filter(username=username).exists():
             return Response({"error": "Username già in uso."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -184,19 +190,35 @@ class GlobalSettingsView(APIView):
         from .models import GlobalSettings
         settings = GlobalSettings.load()
         is_initialized = User.objects.exists()
-        return Response({
+        
+        data = {
             "allow_registration": settings.allow_registration,
             "is_initialized": is_initialized
-        })
+        }
+        
+        # Only return the invite code if the user is an admin
+        if request.user.is_authenticated and request.user.is_staff:
+            data["registration_invite_code"] = settings.registration_invite_code
+            
+        return Response(data)
 
     def patch(self, request):
         from .models import GlobalSettings
         settings = GlobalSettings.load()
+        
         allow_registration = request.data.get("allow_registration")
         if allow_registration is not None:
             settings.allow_registration = bool(allow_registration)
-            settings.save()
-        return Response({"allow_registration": settings.allow_registration})
+            
+        invite_code = request.data.get("registration_invite_code")
+        if invite_code is not None:
+            settings.registration_invite_code = invite_code
+            
+        settings.save()
+        return Response({
+            "allow_registration": settings.allow_registration,
+            "registration_invite_code": settings.registration_invite_code
+        })
 
 
 class MonthlyStatsView(APIView):
