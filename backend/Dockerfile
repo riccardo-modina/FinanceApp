@@ -37,6 +37,13 @@ EXPOSE 8080
 # Ensure Django can find project modules
 ENV PYTHONPATH=/app/src
 
-# Start Gunicorn server
-CMD ["sh", "-c", "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 3"]
+# Copy and set entrypoint and start scripts
+COPY entrypoint.sh /app/entrypoint.sh
+COPY start.sh /app/start.sh
+RUN chmod +x /app/entrypoint.sh /app/start.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Default command
+CMD ["/app/start.sh"]
 
