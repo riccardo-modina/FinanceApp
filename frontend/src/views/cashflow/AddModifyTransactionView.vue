@@ -51,7 +51,9 @@ async function handleSubmit(movementData) {
         const payload = {
             titolo: movementData.title,
             importo: movementData.amount,
-            data: movementData.date instanceof Date ? movementData.date.toISOString().split('T')[0] : movementData.date,
+            data: movementData.date instanceof Date 
+                ? `${movementData.date.getFullYear()}-${String(movementData.date.getMonth() + 1).padStart(2, '0')}-${String(movementData.date.getDate()).padStart(2, '0')}`
+                : movementData.date,
             categoria: movementData.category,
             conto: movementData.account,
             descrizione: movementData.description
