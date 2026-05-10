@@ -6,7 +6,7 @@ export const axiosEventBus = new EventTarget()
 // Otherwise add http/https (absolute path)
 const apiPath = import.meta.env.VITE_API_URL || 'localhost:8000';
 
-const baseURL = apiPath.startsWith('/')
+const baseURL = (apiPath.startsWith('/') || apiPath.includes('://'))
   ? apiPath
   : `${window.location.protocol}//${apiPath}/`;
 
