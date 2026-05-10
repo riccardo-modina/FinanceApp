@@ -356,6 +356,7 @@ const onFocus = () => {
 }
 
 const showNumericError = ref(false)
+const showDecimalError = ref(false)
 const showZeroError = ref(false)
 const shakeTitle = ref(false)
 const shakeDescription = ref(false)
@@ -383,13 +384,19 @@ function onAmountInput(e) {
   const dotsCount = (normalized.match(/\./g) || []).length
   const hasMultipleDots = dotsCount > 1
 
-  if (hasInvalidChars || hasMultipleDots) {
-    showNumericError.value = true
+  // Detect too many decimal places (limit to 4)
+  const decimalPart = normalized.split('.')[1]
+  const hasTooManyDecimals = decimalPart && decimalPart.length > 4
+
+  if (hasInvalidChars || hasMultipleDots || hasTooManyDecimals) {
+    showNumericError.value = hasInvalidChars || hasMultipleDots
+    showDecimalError.value = hasTooManyDecimals
     triggerShake('amount')
     // Revert the input field value to the last valid state
     e.target.value = displayValue.value
   } else {
     showNumericError.value = false
+    showDecimalError.value = false
     displayValue.value = normalized
 
     const parsed = parseFloat(normalized)
@@ -709,6 +716,7 @@ watch(
                     />
                     <div class="flex flex-col mt-1">
                       <InputError :message="showNumericError ? 'Sono consentiti solo numeri e un separatore decimale' : ''" type="warning" />
+                      <InputError :message="showDecimalError ? 'Massimo 4 cifre decimali consentite' : ''" type="warning" />
                       <InputError :message="showZeroError ? 'L\'importo deve essere maggiore di zero' : ''" />
                       <InputError :message="form.amount > 10000000 ? 'Limite massimo di 10M superato!' : ''" />
                       <span class="text-[10px] text-gray-500 mt-0.5">Usa il punto (.) o la virgola (,) per i decimali.</span>
