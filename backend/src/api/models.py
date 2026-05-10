@@ -157,5 +157,14 @@ class GlobalSettings(models.Model):
 
     @classmethod
     def load(cls):
-        obj, created = cls.objects.get_or_create(pk=1)
-        return obj
+        try:
+            # Try to get the first (and only) record
+            obj = cls.objects.filter(pk=1).first()
+            if obj:
+                return obj
+            # If it doesn't exist, try to create it, but catch errors
+            # (e.g. if the table/columns aren't ready yet)
+            return cls.objects.create(pk=1)
+        except Exception:
+            # Fallback for migrations or database issues
+            return cls(pk=1, allow_registration=True)
