@@ -55,10 +55,10 @@ function timeFrameUpdated(timeFrame, source) {
   if (source === 'monthYear') {
     let label = timeFrame.month.toString().padStart(2, '0') + '/' + timeFrame.year
     buttonDesc.value = label
-    return
+  } else {
+    buttonDesc.value = timeFrame.toString()
   }
 
-  buttonDesc.value = timeFrame.toString()
   toggle()
 }
 
