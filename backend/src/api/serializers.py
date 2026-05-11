@@ -124,7 +124,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         from .models import UserProfile
         model = UserProfile
-        fields = ["encrypted_master_key", "recovery_encrypted_master_key"]
+        fields = ["encrypted_master_key", "recovery_encrypted_master_key", "ui_settings"]
 
 class UserMeSerializer(serializers.ModelSerializer):
     class Meta:

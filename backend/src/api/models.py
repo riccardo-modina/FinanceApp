@@ -7,6 +7,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     encrypted_master_key = models.TextField(blank=True, null=True, help_text="Master Key encrypted with the user's password KEK")
     recovery_encrypted_master_key = models.TextField(blank=True, null=True, help_text="Master Key encrypted with the Recovery Key KEK")
+    ui_settings = models.JSONField(default=dict, blank=True, help_text="User UI settings and preferences")
 
     def __str__(self):
         return f"Profile of {self.user.username}"

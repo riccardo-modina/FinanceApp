@@ -94,9 +94,6 @@ const closeBottomSheet = () => {
   }, 300)
 }
 
-watch(() => settings.defaultMenuOpen, () => {
-  window.location.reload()
-})
 
 const toggleMenu = () => {
   isOpen.value = !isOpen.value

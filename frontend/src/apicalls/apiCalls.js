@@ -124,6 +124,10 @@ export function getUserProfile() {
     return apiRequest('auth/profile/', 'GET');
 }
 
+export function updateUserProfile(data) {
+    return apiRequest('auth/profile/', 'PATCH', data);
+}
+
 export function getGlobalSettings() {
     return apiRequest('settings/', 'GET');
 }
