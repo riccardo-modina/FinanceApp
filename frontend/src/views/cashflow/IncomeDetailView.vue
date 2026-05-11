@@ -16,11 +16,12 @@ const selectedCategoryId = ref('');
 
 const parseDataPeriod = (period) => {
   if (!period || period === 'Totale') return { year: 'Totale', month: null };
-  if (period.includes('/')) {
-    const [month, year] = period.split('/');
+  const pStr = String(period);
+  if (pStr.includes('/')) {
+    const [month, year] = pStr.split('/');
     return { year, month: parseInt(month) };
   }
-  return { year: period, month: null };
+  return { year: pStr, month: null };
 };
 
 async function fetchIncomes(reset = false, loadAll = false) {
@@ -53,7 +54,7 @@ async function fetchIncomes(reset = false, loadAll = false) {
       incomes.value = mapped;
       hasMore.value = false;
     } else {
-      incomes.value = [...incomes.value, ...mapped];
+      incomes.value = reset ? mapped : [...incomes.value, ...mapped];
       // Check if there are more pages
       if (res.next) {
         page.value++;

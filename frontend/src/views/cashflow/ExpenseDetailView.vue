@@ -16,11 +16,12 @@ const selectedCategoryId = ref('');
 
 const parseDataPeriod = (period) => {
   if (!period || period === 'Totale') return { year: 'Totale', month: null };
-  if (period.includes('/')) {
-    const [month, year] = period.split('/');
+  const pStr = String(period);
+  if (pStr.includes('/')) {
+    const [month, year] = pStr.split('/');
     return { year, month: parseInt(month) };
   }
-  return { year: period, month: null };
+  return { year: pStr, month: null };
 };
 
 async function fetchExpenses(reset = false, loadAll = false) {
@@ -57,7 +58,7 @@ async function fetchExpenses(reset = false, loadAll = false) {
       expenses.value = mapped;
       hasMore.value = false;
     } else {
-      expenses.value = [...expenses.value, ...mapped];
+      expenses.value = reset ? mapped : [...expenses.value, ...mapped];
       // Check if there are more pages
       if (res.next) {
         page.value++;
