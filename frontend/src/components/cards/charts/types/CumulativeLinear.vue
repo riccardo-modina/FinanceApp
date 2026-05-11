@@ -58,21 +58,13 @@ const categoryLookup = computed(() => {
 })
 
 /**
- * cumulative series category based
+ * individual series per category with ECharts stacking
  */
 const dynamicSeries = computed(() => {
   const series = []
-  let cumulativeOffset = Array(months.value.length).fill(0)
 
   for (const cat in categoryMap.value) {
     const monthlyValues = months.value.map(m => categoryMap.value[cat][m] || 0)
-
-    const cumulativeValues = monthlyValues.map((val, i) => {
-      const sum = cumulativeOffset[i] + val
-      return sum
-    })
-
-    cumulativeOffset = [...cumulativeValues]
 
     // resolve color using normalized lookup (case-insensitive)
     let color = undefined
@@ -91,10 +83,17 @@ const dynamicSeries = computed(() => {
     const serieObj = {
       name: cat,
       type: 'line',
-      data: cumulativeValues
+      stack: 'total', // stack visually
+      areaStyle: {},  // filled area for stacked chart
+      emphasis: { focus: 'series' },
+      data: monthlyValues, // pass original values
+      smooth: true
     }
 
-    if (color) serieObj.itemStyle = { color }
+    if (color) {
+      serieObj.itemStyle = { color }
+      serieObj.areaStyle = { color }
+    }
 
     series.push(serieObj)
   }
