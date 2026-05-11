@@ -1,8 +1,48 @@
 <script setup>
+import { ref, computed } from 'vue';
 import CashFlowMainData from './CashFlowMainData.vue';
 import ChartSection from '../../cards/charts/ChartSection.vue';
 import MonthlyNetChart from '../../cards/charts/types/MonthlyNetChart.vue'
 import CumulativeExpInc from '../../cards/charts/types/CumulativeExpIncChart.vue'
+import ChartDetailModal from '../../modals/ChartDetailModal.vue';
+import { useSettingsStore } from '../../../stores/settings';
+
+const settings = useSettingsStore();
+
+const showDetailModal = ref(false);
+const detailYear = ref('');
+const detailMonth = ref(null);
+
+const parseDataPeriod = (period) => {
+  const p = String(period || '');
+  if (!p || p === 'Totale') return { year: 'Totale', month: null };
+  if (p.includes('/')) {
+    const [month, year] = p.split('/');
+    return { year, month: parseInt(month) };
+  }
+  return { year: p, month: null };
+};
+
+const chartTitle = computed(() => {
+  const { year, month } = parseDataPeriod(settings.dataPeriod);
+  if (month) return 'CashFlow Giornaliero';
+  if (year === 'Totale') return 'CashFlow Annuale';
+  return 'CashFlow Mensile';
+});
+
+const cumulativeTitle = computed(() => {
+  const { year, month } = parseDataPeriod(settings.dataPeriod);
+  if (month) return 'Cumulativo Giornaliero';
+  if (year === 'Totale') return 'Cumulativo Annuale';
+  return 'Cumulativo Mensile';
+});
+
+const handleChartClick = () => {
+  const { year, month } = parseDataPeriod(settings.dataPeriod);
+  detailYear.value = year;
+  detailMonth.value = month;
+  showDetailModal.value = true;
+};
 
 const props = defineProps({
   financeData: {
@@ -26,11 +66,35 @@ const props = defineProps({
     <!-- graphs -->
     <section class="flex-1 h-full 2xl:pb-20">
       <ChartSection
-        :leftChart="{ component: MonthlyNetChart, props: { income: props.financeData.income, spending: props.financeData.spending } }"
-        :rightChart="{ component: CumulativeExpInc, props: { income: props.financeData.income, spending: props.financeData.spending } }"
+        :leftChart="{ 
+          component: MonthlyNetChart, 
+          props: { 
+            income: props.financeData.income, 
+            spending: props.financeData.spending,
+            title: chartTitle
+          },
+          on: { click: handleChartClick }
+        }"
+        :rightChart="{ 
+          component: CumulativeExpInc, 
+          props: { 
+            income: props.financeData.income, 
+            spending: props.financeData.spending,
+            title: cumulativeTitle
+          },
+          on: { click: handleChartClick }
+        }"
         height="h-full"
         />
     </section>
+
+    <!-- detail modal -->
+    <ChartDetailModal 
+      :show="showDetailModal"
+      :year="detailYear"
+      :month="detailMonth"
+      @close="showDetailModal = false"
+    />
 
   </div>
 </template>

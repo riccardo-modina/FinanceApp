@@ -16,12 +16,14 @@ const props = defineProps({
             <ChartCard
                 :chart="leftChart.component"
                 :chartProps="leftChart.props || {}"
+                :chartEvents="leftChart.on || {}"
             />
         </div>
         <div class="w-full h-full min-h-80">
             <ChartCard
                 :chart="rightChart.component"
                 :chartProps="rightChart.props || {}"
+                :chartEvents="rightChart.on || {}"
             />
         </div>    
     </div>

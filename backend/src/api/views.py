@@ -14,7 +14,7 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from django.db import transaction
 from rest_framework.permissions import AllowAny, IsAdminUser
-from django.db.models.functions import TruncMonth
+from django.db.models.functions import TruncMonth, TruncDay, TruncYear
 from django.db.models import Sum
 import datetime
 
@@ -229,59 +229,91 @@ class MonthlyStatsView(APIView):
         now = datetime.datetime.now()
         year = request.query_params.get('year', str(now.year))
         month = request.query_params.get('month')
+        detail = request.query_params.get('detail') # 'month' for full history detail
 
         base_filter = {"user": request.user}
-        if year != 'Totale':
-            base_filter["data__year"] = year
         
-        # Aggregate income by month
+        # Determine aggregation level and base filter
+        if year == 'Totale':
+            if detail == 'month':
+                trunc_func = TruncMonth
+                label_format = "%m/%y" # Will be formatted in python
+            else:
+                trunc_func = TruncYear
+                label_format = "%Y"
+        elif month:
+            base_filter["data__year"] = year
+            base_filter["data__month"] = month
+            trunc_func = TruncDay
+            label_format = "%d/%m"
+        else:
+            base_filter["data__year"] = year
+            trunc_func = TruncMonth
+            label_format = None # We'll use the fixed month list if it's a specific year
+
+        # Aggregate income
         income_stats = Movimento.objects.filter(
             tipo='entrata',
             **base_filter
         ).annotate(
-            month=TruncMonth('data')
-        ).values('month').annotate(
+            period=trunc_func('data')
+        ).values('period').annotate(
             total=Sum('importo')
-        ).order_by('month')
+        ).order_by('period')
 
-        # Aggregate spending by month
+        # Aggregate spending
         spending_stats = Movimento.objects.filter(
             tipo='uscita',
             **base_filter
         ).annotate(
-            month=TruncMonth('data')
-        ).values('month').annotate(
+            period=trunc_func('data')
+        ).values('period').annotate(
             total=Sum('importo')
-        ).order_by('month')
+        ).order_by('period')
 
-        # Format for frontend (using short month names like 'Gen', 'Feb', etc.)
         months_it = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic']
         
-        income_result = {m: 0 for m in months_it}
-        for item in income_stats:
-            month_idx = item['month'].month - 1
-            income_result[months_it[month_idx]] += float(item['total'])
+        if year != 'Totale' and not month:
+            # Traditional 12-month view for a specific year
+            income_result = {m: 0 for m in months_it}
+            for item in income_stats:
+                m_idx = item['period'].month - 1
+                income_result[months_it[m_idx]] += float(item['total'])
+            
+            spending_result = {m: 0 for m in months_it}
+            for item in spending_stats:
+                m_idx = item['period'].month - 1
+                spending_result[months_it[m_idx]] += float(item['total'])
 
-        spending_result = {m: 0 for m in months_it}
-        for item in spending_stats:
-            month_idx = item['month'].month - 1
-            spending_result[months_it[month_idx]] += float(item['total'])
-
-        # Calculate requested month stats or total for the period
-        if month:
-            # If a specific month is requested, return its stats
-            current_month_income = income_result.get(months_it[int(month) - 1], 0)
-            current_month_spending = spending_result.get(months_it[int(month) - 1], 0)
+            final_income = [{"month": m, "amount": val} for m, val in income_result.items()]
+            final_spending = [{"month": m, "amount": val} for m, val in spending_result.items()]
         else:
-            # If no month is selected, return the sum of the entire period (selected year or Totale)
-            current_month_income = sum(income_result.values())
-            current_month_spending = sum(spending_result.values())
+            # Dynamic periods (Totale or Month-daily)
+            # We need to merge periods from both income and spending to have a consistent X-axis
+            all_periods = sorted(list(set(
+                [i['period'] for i in income_stats] + [s['period'] for s in spending_stats]
+            )))
+            
+            income_map = {i['period']: float(i['total']) for i in income_stats}
+            spending_map = {s['period']: float(s['total']) for s in spending_stats}
+            
+            final_income = []
+            final_spending = []
+            
+            for p in all_periods:
+                label = p.strftime(label_format)
+                final_income.append({"month": label, "amount": income_map.get(p, 0)})
+                final_spending.append({"month": label, "amount": spending_map.get(p, 0)})
+
+        # Calculate summary stats (sum of all periods in the current view)
+        current_month_income = sum(i['amount'] for i in final_income)
+        current_month_spending = sum(s['amount'] for s in final_spending)
 
         return Response({
             "year": year,
             "month": month,
-            "income": [{"month": m, "amount": val} for m, val in income_result.items()],
-            "spending": [{"month": m, "amount": val} for m, val in spending_result.items()],
+            "income": final_income,
+            "spending": final_spending,
             "monthlyIncome": current_month_income,
             "monthlyExpense": current_month_spending
         })

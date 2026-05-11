@@ -133,11 +133,12 @@ export function updateRegistrationGlobalSettings(data) {
 }
 
 // -------------------- STATISTICS --------------------
-export function getMonthlyStats(year = new Date().getFullYear().toString(), month = null) {
-    const params = { year };
+export function getMonthlyStats(year = new Date().getFullYear().toString(), month = null, extraParams = {}) {
+    const params = { year, ...extraParams };
     if (month) params.month = month;
     return apiRequest('stats/monthly/', 'GET', null, params);
 }
+
 export function getMetaChoices() {
     return apiRequest('meta/choices/', 'GET');
 }

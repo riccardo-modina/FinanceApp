@@ -9,8 +9,18 @@ const props = defineProps({
   spending: {
     type: Array,
     default: () => []
+  },
+  title: {
+    type: String,
+    default: 'CashFlow Mensile'
   }
 })
+
+const emit = defineEmits(['click'])
+
+const onClick = (params) => {
+  emit('click', params)
+}
 
 // derive months from income and spending (unique, preserving order)
 const months = computed(() => {
@@ -41,7 +51,7 @@ const netSeries = computed(() =>
 
 const option = computed(() => ({
   title: {
-    text: 'CashFlow Mensile',
+    text: props.title,
     padding: [
       0,  // up
       0, // right
@@ -88,7 +98,7 @@ const option = computed(() => ({
 
 <template>
   <div class="h-96 w-full">
-    <v-chart :option="option" autoresize />
+    <v-chart :option="option" autoresize @click="onClick" />
   </div>
 </template>
 
