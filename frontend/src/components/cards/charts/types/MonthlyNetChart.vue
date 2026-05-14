@@ -44,13 +44,9 @@ const months = computed(() => {
       }
       return labels
     } else {
-      // Yearly view: all 12 months
-      const labels = []
-      const shortYear = String(props.year).slice(-2)
-      for (let m = 1; m <= 12; m++) {
-        labels.push(`${String(m).padStart(2, '0')}/${shortYear}`)
-      }
-      return labels
+      // Yearly view: all 12 months (Match backend Italian abbreviations)
+      const months_it = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic']
+      return months_it
     }
   }
 
