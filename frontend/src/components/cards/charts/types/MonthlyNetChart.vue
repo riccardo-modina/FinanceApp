@@ -115,12 +115,16 @@ const option = computed(() => ({
     {
       name: 'Entrate',
       type: 'line',
+      symbol: 'circle',
+      symbolSize: 8,
       data: incomeSeries.value,
       itemStyle: { color: '#41B646' }
     },
     {
       name: 'Uscite',
       type: 'line',
+      symbol: 'circle',
+      symbolSize: 8,
       data: spendingSeries.value,
       itemStyle: { color: '#D6455D' }
     },

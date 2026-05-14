@@ -93,6 +93,8 @@ const dynamicSeries = computed(() => {
       name: cat,
       type: 'line',
       stack: 'total', // stack visually
+      symbol: 'circle',
+      symbolSize: 6,
       areaStyle: {},  // filled area for stacked chart
       emphasis: { focus: 'series' },
       data: monthlyValues, // pass original values

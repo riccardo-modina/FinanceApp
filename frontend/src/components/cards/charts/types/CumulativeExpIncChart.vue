@@ -127,6 +127,8 @@ const option = computed(() => ({
     {
       name: 'Entrate cumulative',
       type: 'line',
+      symbol: 'circle',
+      symbolSize: 8,
       data: incomeCumulative.value,
       smooth: true,
       itemStyle: { color: '#41B646' }
@@ -134,6 +136,8 @@ const option = computed(() => ({
     {
       name: 'Uscite cumulative',
       type: 'line',
+      symbol: 'circle',
+      symbolSize: 8,
       data: spendingCumulative.value,
       smooth: true,
       itemStyle: { color: '#D6455D' }

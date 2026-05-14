@@ -79,6 +79,8 @@ const dynamicSeries = computed(() => {
       name: cat,
       type: 'line',
       stack: 'total',
+      symbol: 'circle',
+      symbolSize: 6,
       areaStyle: {},
       emphasis: { focus: 'series' },
       data: percValues,
