@@ -1,17 +1,39 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import DatePicker from 'primevue/datepicker'
 
-const today = ref(new Date())
-const todayPlaceHolder = today.value;
-today.value.setHours(0, 0, 0, 0)
-const currentYear = computed (() => today.value.getFullYear());
-const currentMonth = computed (()=>today.value.getMonth() + 1);
+const props = defineProps({
+  timeFrame: String
+})
+
+const selectedDate = ref(new Date())
+
+const mode = ref(props.timeFrame?.includes('/') ? 'monthYear' : 'year') 
+
+watch(() => props.timeFrame, (newVal) => {
+  if (!newVal || newVal === 'Totale') {
+    selectedDate.value = null
+    return
+  }
+  if (newVal.includes('/')) {
+    const [month, year] = newVal.split('/')
+    selectedDate.value = new Date(parseInt(year), parseInt(month) - 1, 1)
+  } else {
+    // Check if it's a valid year string
+    const year = parseInt(newVal)
+    if (!isNaN(year)) {
+      selectedDate.value = new Date(year, 0, 1)
+    } else {
+      selectedDate.value = null
+    }
+  }
+}, { immediate: true })
+
+const currentYear = computed (() => new Date().getFullYear());
+const currentMonth = computed (()=> new Date().getMonth() + 1);
 const timeFrameError = ref(false);
 
 const emit = defineEmits(['updateYear', 'updateMonthYear'])
-
-const mode = ref('year') 
 
 function isFutureTimeFrame(timeFrame, source) {
     if (source === 'year') {
@@ -90,46 +112,29 @@ function confirmMonthYear(date) {
       </button>
     </div>
 
-    <!-- Picker per ANNO -->
-    <div v-if="mode === 'year'">
+    <!-- Picker Dinamico -->
+    <div>
       <DatePicker
-        v-model="todayPlaceHolder"
-        view="year"
-        dateFormat="yy"
+        :key="mode"
+        v-model="selectedDate"
+        :view="mode === 'year' ? 'year' : 'month'"
+        :dateFormat="mode === 'year' ? 'yy' : 'mm/yy'"
         append-to="body"
-        @update:modelValue="confirmYear"
+        :placeholder="props.timeFrame === 'Totale' ? 'Totale' : (mode === 'year' ? 'Seleziona Anno' : 'Mese/Anno')"
+        @update:modelValue="mode === 'year' ? confirmYear($event) : confirmMonthYear($event)"
         input-class="w-full px-3 py-2 focus:outline-none text-center text-lg font-medium cursor-pointer bg-primary-light/80 border border-gray-200 rounded-lg shadow-sm"
         :pt="{
-          panel: 'bg-white shadow-md border border-gray-200 rounded-xl p-3 mt-2 absolute z-50',
-          header: 'flex justify-between items-center text-text mb-2',
-          title: 'text-md flex items-center gap-1',
-          prevbutton: 'text-gray-500 hover:text-primary hover:bg-gray-100 rounded p-1 transition',
-          nextbutton: 'text-gray-500 hover:text-primary hover:bg-gray-100 rounded p-1 transition',
-          year: 'flex-1 px-2 py-1 hover:bg-primary hover:text-white rounded cursor-pointer transition m-4',
-          yearSelected: 'bg-primary text-white font-bold rounded'
-        }"
-      />
-    </div>
-
-    <!-- Picker per MESE/ANNO -->
-    <div v-else-if="mode === 'monthYear'">
-      <DatePicker
-        v-model="todayPlaceHolder"
-        view="month"
-        dateFormat="mm/yy"
-        append-to="body"
-        @update:modelValue="confirmMonthYear"
-        input-class="w-full px-3 py-2 focus:outline-none text-center text-lg font-medium cursor-pointer bg-primary-light/80 border border-gray-200 rounded-lg shadow-sm"
-        :pt="{
-          panel: 'bg-white shadow-md border border-gray-200 rounded-xl p-3 mt-2 absolute z-50',
-          header: 'flex justify-between items-center text-text mb-2',
-          title: 'text-md flex items-center gap-1',
-          prevbutton: 'text-gray-500 hover:text-primary hover:bg-gray-100 rounded p-1 transition',
-          nextbutton: 'text-gray-500 hover:text-primary hover:bg-gray-100 rounded p-1 transition',
-          month: 'flex-1 px-2 py-1 hover:bg-primary hover:text-white rounded cursor-pointer transition m-4',
-          monthSelected: 'bg-primary text-white font-bold rounded',
-          year: 'flex-1 px-2 py-1 hover:bg-primary hover:text-white rounded cursor-pointer transition m-4',
-          yearSelected: 'bg-primary text-white font-bold rounded'
+          panel: 'bg-white shadow-2xl border border-gray-200 rounded-2xl p-6 w-[320px]',
+          header: 'flex justify-between items-center text-text mb-4',
+          title: 'text-xl font-bold flex items-center gap-1',
+          prevbutton: 'text-gray-500 hover:text-primary hover:bg-gray-100 rounded-full p-2 transition',
+          nextbutton: 'text-gray-500 hover:text-primary hover:bg-gray-100 rounded-full p-2 transition',
+          yearView: 'flex flex-wrap justify-center gap-1',
+          monthView: 'flex flex-wrap justify-center gap-1',
+          year: 'w-[85px] py-2 flex items-center justify-center hover:bg-primary hover:text-white rounded-xl cursor-pointer transition text-center text-lg font-normal',
+          month: 'w-[85px] py-2 flex items-center justify-center hover:bg-primary hover:text-white rounded-xl cursor-pointer transition text-center text-lg font-normal',
+          yearSelected: 'bg-primary text-white font-bold rounded-xl',
+          monthSelected: 'bg-primary text-white font-bold rounded-xl'
         }"
       />
     </div>
