@@ -104,7 +104,7 @@ const option = computed(() => ({
   title: { text: props.title },
   tooltip: {
     trigger: 'axis',
-    valueFormatter: v => v.toFixed(1) + '%'
+    valueFormatter: v => v.toFixed(2) + '%'
   },
   legend: { 
     type: 'scroll',

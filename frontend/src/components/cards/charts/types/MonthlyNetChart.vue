@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { fillTimelineGaps } from '@/helpers/charts/gapFiller.js'
+import { formatAmount } from '@/helpers/dateUtils'
 
 const props = defineProps({
   income: {
@@ -88,7 +89,8 @@ const option = computed(() => ({
     ]
   },
   tooltip: {
-    trigger: 'axis'
+    trigger: 'axis',
+    valueFormatter: (value) => '€ ' + formatAmount(value)
   },
   legend: {
     type: 'scroll',

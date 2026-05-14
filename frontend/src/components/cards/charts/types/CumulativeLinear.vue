@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { mapSerie } from '@/helpers/mappers/expenseIncomeMapper.js'
+import { formatAmount } from '@/helpers/dateUtils'
 
 const props = defineProps({
   serie: {
@@ -114,7 +115,10 @@ const dynamicSeries = computed(() => {
  */
 const option = computed(() => ({
   title: { text: props.title },
-  tooltip: { trigger: 'axis' },
+  tooltip: { 
+    trigger: 'axis',
+    valueFormatter: (value) => '€ ' + formatAmount(value)
+  },
   legend: { 
     type: 'scroll',
     bottom: 0,
