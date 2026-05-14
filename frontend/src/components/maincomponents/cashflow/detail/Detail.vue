@@ -89,7 +89,7 @@ function onLoadMore() {
 </script>
 
 <template>
-    <div class="flex flex-col h-full gap-4">
+    <div class="flex flex-col gap-4">
         <section>
             <ChartSection
                 :leftChart="{ component: CumulativeLinear, props: { serie: serie, categories: categories, year: year, month: month } }"

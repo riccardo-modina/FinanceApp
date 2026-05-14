@@ -7,6 +7,7 @@ export const useSettingsStore = defineStore('settings', () => {
   const currencySymbol = ref(localStorage.getItem('currencySymbol') || 'EUR')
   const defaultMenuOpen = ref(localStorage.getItem('defaultMenuOpen') === 'true')
   const dataPeriod = ref(localStorage.getItem('dataPeriod') || new Date().getFullYear().toString())
+  const chartsLayout = ref(localStorage.getItem('chartsLayout') || 'grid')
 
   const loading = ref(false)
   const initialized = ref(false)
@@ -23,6 +24,7 @@ export const useSettingsStore = defineStore('settings', () => {
         if (s.currencySymbol) currencySymbol.value = s.currencySymbol
         if (s.defaultMenuOpen !== undefined) defaultMenuOpen.value = s.defaultMenuOpen
         if (s.dataPeriod) dataPeriod.value = s.dataPeriod
+        if (s.chartsLayout) chartsLayout.value = s.chartsLayout
         
         // sync to localstorage for offline/initial load fallback
         syncToLocalStorage()
@@ -49,7 +51,8 @@ export const useSettingsStore = defineStore('settings', () => {
             currencyFormat: currencyFormat.value,
             currencySymbol: currencySymbol.value,
             defaultMenuOpen: defaultMenuOpen.value,
-            dataPeriod: dataPeriod.value
+            dataPeriod: dataPeriod.value,
+            chartsLayout: chartsLayout.value
           }
         })
         syncToLocalStorage()
@@ -69,10 +72,11 @@ export const useSettingsStore = defineStore('settings', () => {
      localStorage.setItem('defaultMenuOpen', defaultMenuOpen.value)
      localStorage.setItem('dataPeriod', dataPeriod.value)
      localStorage.setItem('currencySymbol', currencySymbol.value)
+     localStorage.setItem('chartsLayout', chartsLayout.value)
   }
 
   // Watch for changes to save them to DB
-  watch([currencyFormat, defaultMenuOpen, dataPeriod, currencySymbol], () => {
+  watch([currencyFormat, defaultMenuOpen, dataPeriod, currencySymbol, chartsLayout], () => {
     saveSettings()
   }, { deep: true })
 
@@ -92,6 +96,7 @@ export const useSettingsStore = defineStore('settings', () => {
     defaultMenuOpen, 
     dataPeriod, 
     currencySymbol, 
+    chartsLayout,
     displayCurrencySymbol,
     fetchSettings,
     loading

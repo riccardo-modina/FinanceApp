@@ -3,7 +3,8 @@ import { ref, onMounted } from 'vue';
 import { Switch } from '@headlessui/vue';
 import { getCurrentUser } from '../../../apicalls/apiCalls';
 import { useAuth } from '../../../composables/useAuth';
-import { ArrowRightStartOnRectangleIcon } from '@heroicons/vue/24/outline';
+import { useSettingsStore } from '../../../stores/settings';
+import { ArrowRightStartOnRectangleIcon, Squares2X2Icon, TableCellsIcon } from '@heroicons/vue/24/outline';
 
 defineProps({
     defaultMenuOpen: {
@@ -15,6 +16,7 @@ defineProps({
 const emit = defineEmits(['update:defaultMenuOpen']); 
 
 const { logout } = useAuth();
+const settings = useSettingsStore();
 
 const isAdmin = ref(false);
 const loadingAdminSettings = ref(true);
@@ -53,6 +55,28 @@ function toggleMenu(newValue) {
                             <span
                                 :class="[
                                 defaultMenuOpen ? 'translate-x-6' : 'translate-x-1',
+                                'inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300'
+                                ]"
+                            />
+                        </Switch>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100 mt-2 pt-2">
+                    <div class="text-text m-6 text-xl font-bold">Grafici</div>
+                    <div class="flex text-text m-6 gap-6 items-center">
+                        <div>Layout incolonnato (verticale)</div>
+                         <Switch
+                            :modelValue="settings.chartsLayout === 'stack'"
+                            @update:modelValue="(val) => settings.chartsLayout = val ? 'stack' : 'grid'"
+                            :class="[
+                                settings.chartsLayout === 'stack' ? 'bg-primary-light' : 'bg-gray-300',
+                                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer'
+                            ]"
+                            >
+                            <span
+                                :class="[
+                                settings.chartsLayout === 'stack' ? 'translate-x-6' : 'translate-x-1',
                                 'inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300'
                                 ]"
                             />

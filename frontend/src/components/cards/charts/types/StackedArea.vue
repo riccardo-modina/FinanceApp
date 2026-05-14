@@ -132,7 +132,7 @@ const option = computed(() => ({
 </script>
 
 <template>
-  <div class="h-96 w-full">
+  <div class="h-full w-full">
     <v-chart :option="option" autoresize />
   </div>
 </template>
