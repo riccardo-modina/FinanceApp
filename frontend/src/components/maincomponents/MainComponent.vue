@@ -71,7 +71,7 @@ function close() {
       </div>
 
       <div 
-        :class="['flex-1 flex flex-col transition-all duration-300',
+        :class="['flex-1 flex flex-col',
                 settings.defaultMenuOpen ? 'ml-0' : 'ml-0 md:ml-8']"
       >
           

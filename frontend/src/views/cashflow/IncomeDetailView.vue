@@ -10,56 +10,92 @@ import { parseDataPeriod } from '@/helpers/dateUtils';
 const financials = useFinancialsStore();
 const settings = useSettingsStore();
 const incomes = ref([]);
-const page = ref(1);
 const loading = ref(false);
+const loadingBackground = ref(false);
 const hasMore = ref(true);
 const selectedCategoryId = ref('');
 
+// To prevent overlapping background fetches
+let currentFetchId = 0;
 
-async function fetchIncomes(reset = false, loadAll = false) {
+function mapMovement(m) {
+  return {
+    ...m,
+    date: new Date(m.data).toLocaleDateString('it-IT'),
+    amount: Number(m.importo),
+    title: m.titolo,
+    category: m.categoria ? m.categoria.nome : 'Nessuna',
+    categoryColor: m.categoria ? m.categoria.color : '#ccc'
+  };
+}
+
+async function fetchIncomes(reset = false) {
+  const fetchId = ++currentFetchId;
+  
   if (reset) {
-    page.value = 1;
     incomes.value = [];
     hasMore.value = true;
+    loadingBackground.value = false;
   }
+  
   loading.value = true;
   try {
     const { year, month } = parseDataPeriod(settings.dataPeriod);
     const filters = { tipo: 'entrata' };
     if (selectedCategoryId.value) filters.categoria = selectedCategoryId.value;
     
-    const pageSize = loadAll ? 'all' : 20;
-    const res = await getMovimenti(page.value, pageSize, year, month, filters);
+    // First Page: 500 items for immediate feedback
+    const res = await getMovimenti(1, 500, year, month, filters);
+    
+    // If a new fetch has started, abort this one
+    if (fetchId !== currentFetchId) return;
+
     const data = res.results || res;
+    incomes.value = data.map(mapMovement);
     
-    const mapped = data
-      .map(m => ({
-        ...m,
-        date: new Date(m.data).toLocaleDateString('it-IT'),
-        amount: Number(m.importo),
-        title: m.titolo,
-        category: m.categoria ? m.categoria.nome : 'Nessuna',
-        categoryColor: m.categoria ? m.categoria.color : '#ccc'
-      }));
-    
-    if (loadAll) {
-      incomes.value = mapped;
-      hasMore.value = false;
+    if (res.next) {
+      hasMore.value = true;
+      // Start background fetching the rest in chunks of 5000 
+      // If we got 500, and there is more, we just fetch page 2 with size 5000.
+      fetchRemainingIncomes(fetchId, 2, 5000, year, month, filters);
     } else {
-      incomes.value = reset ? mapped : [...incomes.value, ...mapped];
-      // Check if there are more pages
-      if (res.next) {
-        page.value++;
-        hasMore.value = true;
-      } else {
-        hasMore.value = false;
-      }
+      hasMore.value = false;
     }
   } catch (err) {
     console.error("Error fetching incomes:", err);
   } finally {
-    loading.value = false;
+    if (fetchId === currentFetchId) loading.value = false;
   }
+}
+
+async function fetchRemainingIncomes(fetchId, startPage, pageSize, year, month, filters) {
+  loadingBackground.value = true;
+  let page = startPage;
+  let more = true;
+
+  while (more && fetchId === currentFetchId) {
+    try {
+      const res = await getMovimenti(page, pageSize, year, month, filters);
+      if (fetchId !== currentFetchId) break;
+
+      const data = res.results || res;
+      const mapped = data.map(mapMovement);
+      
+      incomes.value = [...incomes.value, ...mapped];
+      
+      if (res.next) {
+        page++;
+      } else {
+        more = false;
+        hasMore.value = false;
+      }
+    } catch (err) {
+      console.error("Error in background fetch:", err);
+      more = false;
+    }
+  }
+  
+  if (fetchId === currentFetchId) loadingBackground.value = false;
 }
 
 const unclassifiedCount = computed(() => {
@@ -85,7 +121,7 @@ onMounted(() => {
   if (financials.cashFlowCategories.length === 0) {
     financials.fetchAll();
   }
-  fetchIncomes();
+  fetchIncomes(true);
 });
 
 
@@ -95,23 +131,23 @@ onMounted(() => {
   <MainComponent
   :mainComponent="Detail"
   :mainProps="{ 
-    desc: 'Dettagli Entrate', 
+    desc: 'Movimenti', 
     serie: incomes, 
     categories: financials.cashFlowCategories.filter(c => c.tipo === 'entrata'),
     hasMore: hasMore,
     selectedCategory: selectedCategoryId,
     unclassifiedCount: unclassifiedCount,
     year: parseDataPeriod(settings.dataPeriod).year,
-    month: parseDataPeriod(settings.dataPeriod).month
+    month: parseDataPeriod(settings.dataPeriod).month,
+    loadingBackground: loadingBackground
   }"
   :showTopSection=true
-  topSectionTitle="Dettagli Entrate"
+  topSectionTitle="Dettaglio Entrate"
   :showAddButton=true
   :showTimeButton=true
   :listen="{
     'delete-movement': handleDelete,
-    'load-more': () => fetchIncomes(),
-    'load-all': () => fetchIncomes(true, true),
+    'load-more': () => {}, // Disable manual load more as it's now automatic
     'filter-category': (val) => selectedCategoryId = val
   }"
   />

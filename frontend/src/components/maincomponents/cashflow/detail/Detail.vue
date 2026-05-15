@@ -43,6 +43,10 @@ const props = defineProps({
     month: {
         type: Number,
         default: null
+    },
+    loadingBackground: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -103,16 +107,12 @@ function onLoadMore() {
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <h1 class="text-2xl font-semibold">{{ desc }}</h1>
                             <div class="flex flex-col sm:flex-row gap-3 items-center w-full md:w-auto">
-                                <!-- Load All Button at the top -->
-                                <BaseButton 
-                                    v-if="hasMore" 
-                                    as="button" 
-                                    class="w-full sm:w-auto px-4 py-2 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/10 hover:bg-primary-hover transition-all text-sm" 
-                                    @click="$emit('load-all')"
-                                >
-                                    Carica Tutto
-                                </BaseButton>
-                                <div v-else-if="hasMovements" class="hidden sm:block text-xs text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100 font-medium">
+                                <!-- Background loading indicator -->
+                                <div v-if="loadingBackground" class="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full border border-blue-100 text-xs font-medium animate-pulse">
+                                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
+                                    Caricamento storico...
+                                </div>
+                                <div v-else-if="hasMovements && !hasMore" class="hidden sm:block text-xs text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100 font-medium">
                                     ✓ Dati completi
                                 </div>
 

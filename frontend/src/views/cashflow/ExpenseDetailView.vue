@@ -10,60 +10,91 @@ import { parseDataPeriod } from '@/helpers/dateUtils';
 const financials = useFinancialsStore();
 const settings = useSettingsStore();
 const expenses = ref([]);
-const page = ref(1);
 const loading = ref(false);
+const loadingBackground = ref(false);
 const hasMore = ref(true);
 const selectedCategoryId = ref('');
 
+// To prevent overlapping background fetches
+let currentFetchId = 0;
 
-async function fetchExpenses(reset = false, loadAll = false) {
+function mapMovement(m) {
+  return {
+    ...m,
+    date: new Date(m.data).toLocaleDateString('it-IT'),
+    amount: Number(m.importo),
+    title: m.titolo,
+    category: m.categoria ? m.categoria.nome : 'Nessuna',
+    categoryColor: m.categoria ? m.categoria.color : '#ccc'
+  };
+}
+
+async function fetchExpenses(reset = false) {
+  const fetchId = ++currentFetchId;
+  
   if (reset) {
-    page.value = 1;
     expenses.value = [];
     hasMore.value = true;
+    loadingBackground.value = false;
   }
+  
   loading.value = true;
   try {
     const { year, month } = parseDataPeriod(settings.dataPeriod);
     const filters = { tipo: 'uscita' };
     if (selectedCategoryId.value) filters.categoria = selectedCategoryId.value;
     
-    // If loadAll is true, we use page_size='all'
-    const pageSize = loadAll ? 'all' : 20;
-    const res = await getMovimenti(page.value, pageSize, year, month, filters);
+    // First Page: 500 items for immediate feedback
+    const res = await getMovimenti(1, 500, year, month, filters);
     
-    // When pageSize is 'all', res is likely the array itself or res.results is undefined depending on API
-    // But based on apiCalls.js, it handles res.results or res as array.
+    // If a new fetch has started, abort this one
+    if (fetchId !== currentFetchId) return;
+
     const data = res.results || res;
+    expenses.value = data.map(mapMovement);
     
-    const mapped = data
-      .map(m => ({
-        ...m,
-        date: new Date(m.data).toLocaleDateString('it-IT'),
-        amount: Number(m.importo),
-        title: m.titolo,
-        category: m.categoria ? m.categoria.nome : 'Nessuna',
-        categoryColor: m.categoria ? m.categoria.color : '#ccc'
-      }));
-    
-    if (loadAll) {
-      expenses.value = mapped;
-      hasMore.value = false;
+    if (res.next) {
+      hasMore.value = true;
+      // Start background fetching the rest in chunks of 5000
+      fetchRemainingExpenses(fetchId, 2, 5000, year, month, filters);
     } else {
-      expenses.value = reset ? mapped : [...expenses.value, ...mapped];
-      // Check if there are more pages
-      if (res.next) {
-        page.value++;
-        hasMore.value = true;
-      } else {
-        hasMore.value = false;
-      }
+      hasMore.value = false;
     }
   } catch (err) {
     console.error("Error fetching expenses:", err);
   } finally {
-    loading.value = false;
+    if (fetchId === currentFetchId) loading.value = false;
   }
+}
+
+async function fetchRemainingExpenses(fetchId, startPage, pageSize, year, month, filters) {
+  loadingBackground.value = true;
+  let page = startPage;
+  let more = true;
+
+  while (more && fetchId === currentFetchId) {
+    try {
+      const res = await getMovimenti(page, pageSize, year, month, filters);
+      if (fetchId !== currentFetchId) break;
+
+      const data = res.results || res;
+      const mapped = data.map(mapMovement);
+      
+      expenses.value = [...expenses.value, ...mapped];
+      
+      if (res.next) {
+        page++;
+      } else {
+        more = false;
+        hasMore.value = false;
+      }
+    } catch (err) {
+      console.error("Error in background fetch:", err);
+      more = false;
+    }
+  }
+  
+  if (fetchId === currentFetchId) loadingBackground.value = false;
 }
 
 const unclassifiedCount = computed(() => {
@@ -89,7 +120,7 @@ onMounted(() => {
   if (financials.cashFlowCategories.length === 0) {
     financials.fetchAll();
   }
-  fetchExpenses();
+  fetchExpenses(true);
 });
 
 
@@ -99,23 +130,23 @@ onMounted(() => {
   <MainComponent
   :mainComponent="Detail"
   :mainProps="{ 
-    desc: 'Dettagli Spese', 
+    desc: 'Movimenti', 
     serie: expenses, 
     categories: financials.cashFlowCategories.filter(c => c.tipo === 'uscita'),
     hasMore: hasMore,
     selectedCategory: selectedCategoryId,
     unclassifiedCount: unclassifiedCount,
     year: parseDataPeriod(settings.dataPeriod).year,
-    month: parseDataPeriod(settings.dataPeriod).month
+    month: parseDataPeriod(settings.dataPeriod).month,
+    loadingBackground: loadingBackground
   }"
   :showTopSection=true
-  topSectionTitle="Dettagli Spese"
+  topSectionTitle="Dettaglio Spese"
   :showAddButton=true
   :showTimeButton=true
   :listen="{
     'delete-movement': handleDelete,
-    'load-more': () => fetchExpenses(),
-    'load-all': () => fetchExpenses(true, true),
+    'load-more': () => {}, // Disable manual load more as it's now automatic
     'filter-category': (val) => selectedCategoryId = val
   }"
   />

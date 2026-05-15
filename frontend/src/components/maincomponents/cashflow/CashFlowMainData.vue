@@ -32,7 +32,7 @@ const netSign = computed(() => {
           :icon="BanknotesIcon"
           :sign="netSign"
           iconColor="text-nett"
-          class="relative h-full items-center justify-center p-6 rounded-2xl shadow-sm border border-menuborder/50 transition-all duration-300 snake-border snake-nett"
+          class="relative h-full items-center justify-center p-6 rounded-2xl shadow-sm border border-menuborder/50 snake-border snake-nett"
           iconBackground="bg-nett/10"
           iconContainerClass="hide-icon-custom"
         />
@@ -46,7 +46,7 @@ const netSign = computed(() => {
           color="bg-card-background"
           :icon="ArrowRightEndOnRectangleIcon"
           iconColor="text-success"
-          class="relative h-full items-center justify-center p-6 rounded-2xl shadow-sm border border-menuborder/50 transition-all duration-300 group-hover:shadow-md group-hover:-translate-y-1 snake-border snake-success"
+          class="relative h-full items-center justify-center p-6 rounded-2xl shadow-sm border border-menuborder/50 group-hover:shadow-md group-hover:-translate-y-1 snake-border snake-success"
           iconBackground="bg-success/10"
           iconContainerClass="hide-icon-custom"
         />
@@ -60,7 +60,7 @@ const netSign = computed(() => {
           color="bg-card-background"
           :icon="ArrowRightStartOnRectangleIcon"
           iconColor="text-negative"
-          class="relative h-full items-center justify-center p-6 rounded-2xl shadow-sm border border-menuborder/50 transition-all duration-300 group-hover:shadow-md group-hover:-translate-y-1 snake-border snake-negative"
+          class="relative h-full items-center justify-center p-6 rounded-2xl shadow-sm border border-menuborder/50 group-hover:shadow-md group-hover:-translate-y-1 snake-border snake-negative"
           iconBackground="bg-negative/10"
           iconContainerClass="hide-icon-custom"
         />

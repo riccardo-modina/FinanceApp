@@ -16,7 +16,7 @@ const props = defineProps({
 <template>
     <div 
       :class="[
-        'gap-4 w-full transition-all duration-500', 
+        'gap-4 w-full', 
         settings.chartsLayout === 'stack' ? 'flex flex-col h-auto' : ['grid grid-cols-1 lg:grid-cols-2', height]
       ]"
     >

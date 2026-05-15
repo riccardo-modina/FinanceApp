@@ -1,6 +1,9 @@
 <script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import BaseButton from '@/components/buttons/BaseButton.vue';
 import { formatAmount } from '@/helpers/dateUtils';
+import VirtualScroller from 'primevue/virtualscroller';
+import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     movements: {
@@ -11,33 +14,143 @@ const props = defineProps({
 
 const emit = defineEmits(['modify', 'delete'])
 
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+const handleResize = () => {
+    windowWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+    window.addEventListener('resize', handleResize);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('resize', handleResize);
+});
+
+const itemSize = computed(() => windowWidth.value < 768 ? 105 : 120);
+
 </script>
 
 <template>
-    <ul class="flex flex-col divide-y">
-        <li v-for="mv in movements" :key="mv.id || mv" class="py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
-            <!-- Left side: Info -->
-            <div class="flex flex-col md:flex-row md:items-center md:gap-4">
-                <div class="flex items-center justify-between md:justify-start gap-2">
-                    <div class="text-sm text-gray-600">{{ mv.date }}</div>
-                    <!-- Mobile only amount, visible on small screens if we want, but let's keep it consistent -->
-                </div>
-                
-                <div class="flex flex-col md:flex-row md:items-center md:gap-4">
-                    <div class="text-sm font-medium">{{ mv.title }}</div>
-                    <div class="text-sm text-gray-500">{{ mv.category }}</div>
-                </div>
-            </div>
+    <div class="w-full">
+        <VirtualScroller 
+            :items="movements" 
+            :itemSize="itemSize" 
+            class="w-full"
+            style="height: 600px"
+            :pt="{
+                content: 'flex flex-col'
+            }"
+        >
+            <template v-slot:item="{ item: mv, options }">
+                <div 
+                    :class="[
+                        'py-2 md:py-4 px-2',
+                        options.index !== 0 ? 'border-t border-gray-50' : ''
+                    ]"
+                    :style="{ height: itemSize + 'px' }"
+                >
+                    <!-- DESKTOP LAYOUT -->
+                    <div class="hidden md:grid md:grid-cols-[100px_2fr_1fr_120px_100px] md:gap-x-10 items-center w-full max-w-full mx-auto px-10 lg:px-20 h-full">
+                        <!-- Date -->
+                        <div class="flex justify-center">
+                            <div class="text-sm font-medium text-gray-400 bg-gray-100 px-3 py-0.5 rounded text-center">
+                                {{ mv.date }}
+                            </div>
+                        </div>
+                        
+                        <!-- Title & Category -->
+                        <div class="flex flex-col items-start justify-center overflow-hidden gap-1">
+                            <div class="text-sm font-bold text-gray-800 truncate w-full">
+                                {{ mv.title }}
+                            </div>
+                            <div class="flex items-center gap-3 opacity-60">
+                                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" :style="{ backgroundColor: mv.categoryColor || '#ccc' }"></span>
+                                <div class="text-[11px] font-medium text-gray-500 uppercase tracking-wide truncate">
+                                    {{ mv.category }}
+                                </div>
+                            </div>
+                        </div>
 
-            <!-- Right side: Amount & Actions -->
-            <div class="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto mt-2 md:mt-0">
-                <div class="text-sm font-semibold md:mr-4">€ {{ formatAmount(mv.amount) }}</div>
-                
-                <div class="flex gap-2">
-                    <BaseButton as="button" class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs md:text-sm" @click="$emit('modify', mv)">Modifica</BaseButton>
-                    <BaseButton as="button" class="px-3 py-1 bg-red-100 text-red-800 text-xs md:text-sm" @click="$emit('delete', mv)">Elimina</BaseButton>
+                        <!-- Spacer -->
+                        <div></div>
+
+                        <!-- Amount -->
+                        <div 
+                            class="text-base whitespace-nowrap text-left"
+                            :class="(mv.amount < 0 || mv.tipo === 'uscita') ? 'text-red-600 font-normal' : 'text-green-600 font-black'"
+                        >
+                            {{ (mv.amount < 0 || mv.tipo === 'uscita') ? '-' : '+' }} € {{ formatAmount(mv.amount) }}
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="flex items-center justify-start gap-2">
+                            <BaseButton 
+                                as="button"
+                                class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                @click="$emit('modify', mv)"
+                                title="Modifica"
+                            >
+                                <PencilSquareIcon class="h-5 w-5" />
+                            </BaseButton>
+                            <BaseButton 
+                                as="button"
+                                class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                @click="$emit('delete', mv)"
+                                title="Elimina"
+                            >
+                                <TrashIcon class="h-5 w-5" />
+                            </BaseButton>
+                        </div>
+                    </div>
+
+                    <!-- MOBILE LAYOUT -->
+                    <div class="flex md:hidden flex-col justify-center gap-2 w-full px-4 h-full">
+                        <div class="flex items-center justify-between w-full">
+                            <div class="text-sm font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
+                                {{ mv.date }}
+                            </div>
+                            <div class="flex items-center gap-1.5 opacity-60">
+                                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" :style="{ backgroundColor: mv.categoryColor || '#ccc' }"></span>
+                                <div class="text-[10px] font-medium text-gray-500 uppercase tracking-wide">
+                                    {{ mv.category }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-sm font-bold text-gray-800 truncate w-full">
+                            {{ mv.title }}
+                        </div>
+
+                        <div class="flex items-center justify-between w-full">
+                            <div 
+                                class="text-sm whitespace-nowrap text-left"
+                                :class="(mv.amount < 0 || mv.tipo === 'uscita') ? 'text-red-600 font-normal' : 'text-green-600 font-black'"
+                            >
+                                {{ (mv.amount < 0 || mv.tipo === 'uscita') ? '-' : '+' }} € {{ formatAmount(mv.amount) }}
+                            </div>
+                            
+                            <div class="flex items-center gap-4">
+                                <BaseButton 
+                                    as="button"
+                                    class="p-1 text-gray-400"
+                                    @click="$emit('modify', mv)"
+                                >
+                                    <PencilSquareIcon class="h-5 w-5" />
+                                </BaseButton>
+                                <BaseButton 
+                                    as="button"
+                                    class="p-1 text-gray-400"
+                                    @click="$emit('delete', mv)"
+                                >
+                                    <TrashIcon class="h-5 w-5" />
+                                </BaseButton>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </li>
-    </ul>
+            </template>
+        </VirtualScroller>
+    </div>
 </template>
