@@ -1,6 +1,4 @@
 <script setup>
-import { PencilSquareIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
-
 const props = defineProps(['categoriesByType', 'typeLabels']);
 const emit = defineEmits(['edit', 'delete', 'create']);
 </script>
@@ -31,7 +29,7 @@ const emit = defineEmits(['edit', 'delete', 'create']);
               class="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
               title="Modifica"
             >
-              <PencilSquareIcon class="w-5 h-5" />
+              <i class="pi pi-pencil" />
             </button>
             <button 
               v-if="!cat.is_system"
@@ -39,7 +37,7 @@ const emit = defineEmits(['edit', 'delete', 'create']);
               class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
               title="Elimina"
             >
-              <TrashIcon class="w-5 h-5" />
+              <i class="pi pi-trash" />
             </button>
           </div>
         </div>
@@ -51,7 +49,7 @@ const emit = defineEmits(['edit', 'delete', 'create']);
           @click="$emit('create')" 
           class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl shadow-lg hover:bg-primary-dark transition-all transform hover:scale-105 active:scale-95 font-semibold"
       >
-          <PlusIcon class="w-5 h-5" />
+          <i class="pi pi-plus" />
           Nuova Categoria
       </button>
     </div>

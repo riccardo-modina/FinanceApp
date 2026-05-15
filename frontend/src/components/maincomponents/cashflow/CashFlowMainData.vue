@@ -1,10 +1,7 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import NumberCard from '../../cards/NumberCard.vue';
-import { ArrowRightEndOnRectangleIcon } from '@heroicons/vue/24/outline';
-import { ArrowRightStartOnRectangleIcon } from '@heroicons/vue/24/outline';
-import { BanknotesIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
   income: { type: Number, required: true },
@@ -29,7 +26,7 @@ const netSign = computed(() => {
           title="Netto" 
           :value="net"
           color="bg-card-background"
-          :icon="BanknotesIcon"
+          icon="pi-money-bill"
           :sign="netSign"
           iconColor="text-nett"
           class="relative h-full items-center justify-center p-6 rounded-2xl shadow-sm border border-menuborder/50 snake-border snake-nett"
@@ -44,7 +41,7 @@ const netSign = computed(() => {
           title="Entrate" 
           :value="income" 
           color="bg-card-background"
-          :icon="ArrowRightEndOnRectangleIcon"
+          icon="pi-sign-in"
           iconColor="text-success"
           class="relative h-full items-center justify-center p-6 rounded-2xl shadow-sm border border-menuborder/50 group-hover:shadow-md group-hover:-translate-y-1 snake-border snake-success"
           iconBackground="bg-success/10"
@@ -58,7 +55,7 @@ const netSign = computed(() => {
           title="Uscite" 
           :value="expense"  
           color="bg-card-background"
-          :icon="ArrowRightStartOnRectangleIcon"
+          icon="pi-sign-out"
           iconColor="text-negative"
           class="relative h-full items-center justify-center p-6 rounded-2xl shadow-sm border border-menuborder/50 group-hover:shadow-md group-hover:-translate-y-1 snake-border snake-negative"
           iconBackground="bg-negative/10"

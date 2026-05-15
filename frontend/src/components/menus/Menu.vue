@@ -1,14 +1,6 @@
 <script setup>
 import { ref, watch, onUnmounted, onMounted } from 'vue'
-import { 
-  Bars3Icon, PaperAirplaneIcon, WalletIcon, HomeIcon, PlusIcon, ArrowTrendingUpIcon, ClipboardIcon, Cog6ToothIcon, 
-  ChevronLeftIcon, BanknotesIcon, CreditCardIcon, XMarkIcon, ArrowRightStartOnRectangleIcon, TagIcon
-} from '@heroicons/vue/24/outline'
-import { 
-  PaperAirplaneIcon as PaperAirplaneIconSolid, WalletIcon as WalletIconSolid, ArrowTrendingUpIcon as ArrowTrendingUpIconSolid,
-  HomeIcon as HomeIconSolid, ClipboardIcon as ClipboardIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, 
-  ArrowRightStartOnRectangleIcon as ArrowRightStartOnRectangleIconSolid, TagIcon as TagIconSolid
-} from '@heroicons/vue/24/solid'
+
 import MenuVoice from './MenuVoice.vue'
 import { useSettingsStore } from '../../stores/settings'
 import { useAuth } from '../../composables/useAuth'
@@ -23,20 +15,19 @@ const handleLogout = () => {
 }
 
 const menuOptions = ref([
-  { name: 'Dashboard', route: '/', icon: HomeIcon, iconSolid: HomeIconSolid },
+  { name: 'Dashboard', route: '/', icon: 'pi-home', iconSolid: 'pi-home' },
   { 
     name: 'CashFlow', 
     route: '/cashflow', 
-    icon: WalletIcon, 
-    iconSolid: WalletIconSolid,
+    icon: 'pi-chart-bar', 
+    iconSolid: 'pi-chart-bar',
     voices: [
-      { name: 'Spese', route: '/cashflow/expenses', icon: CreditCardIcon, iconSolid: CreditCardIcon },
-      { name: 'Entrate', route: '/cashflow/income', icon: BanknotesIcon, iconSolid: BanknotesIcon },
-      { name: 'Categorie', route: '/cashflow/categories', icon: TagIcon, iconSolid: TagIconSolid },
+      { name: 'Confronto', route: '/notfound', icon: 'pi-chart-scatter', iconSolid: 'pi-chart-line' },
+      { name: 'Conti', route: '/notfound', icon: 'pi-building-columns', iconSolid: 'pi-credit-card' },
     ]
   },
-  { name: 'Investimenti', route: '/notfound', icon: ArrowTrendingUpIcon, iconSolid: ArrowTrendingUpIconSolid },
-  { name: 'Budget', route: '/notfound', icon: ClipboardIcon, iconSolid: ClipboardIconSolid }
+  { name: 'Investimenti', route: '/notfound', icon: 'pi-chart-line', iconSolid: 'pi-chart-bar' },
+  { name: 'Budget', route: '/notfound', icon: 'pi-wallet', iconSolid: 'pi-chart-line' }
 ])
 
 const settings = useSettingsStore();
@@ -151,13 +142,12 @@ onMounted(() => {
                 class="flex justify-center hover:cursor-pointer mb-10"
                 @click="closeSubMenu"
               >
-                  <component 
-                    :is="isHoverHomeIcon ? HomeIconSolid : HomeIcon" 
+                  <i 
                     :class="[
-                      'hidden md:block h-10 w-10 transform !duration-100',
+                      'pi pi-home hidden md:block text-4xl transform transition-colors !duration-100',
                       isHoverHomeIcon ? 'text-primary' : 'text-gray-500'
                     ]"
-                  />
+                  ></i>
               </li>
             </RouterLink>
             
@@ -175,14 +165,14 @@ onMounted(() => {
               <MenuVoice
                 menuVoice="Settings"
                 route="/settings"
-                :icon="Cog6ToothIcon"
-                :iconSolid="Cog6ToothIconSolid"
+                icon="pi-cog"
+                iconSolid="pi-cog"
                 @click="closeSubMenu"
               />
               <MenuVoice
                 menuVoice="Logout"
-                :icon="ArrowRightStartOnRectangleIcon"
-                :iconSolid="ArrowRightStartOnRectangleIconSolid"
+                icon="pi-sign-out"
+                iconSolid="pi-sign-out"
                 @click="handleLogout"
               />
             </div>
@@ -200,7 +190,7 @@ onMounted(() => {
                 @click="closeSubMenu"
                 class="flex flex-col items-center justify-center w-full text-gray-500 hover:text-primary transition-colors gap-1"
               >
-                <ChevronLeftIcon class="h-6 w-6" />
+                <i class="pi pi-chevron-left text-2xl" />
                 <span class="text-xs font-bold uppercase tracking-wider">Indietro</span>
               </button>
             </div>
@@ -234,7 +224,7 @@ onMounted(() => {
       :class="['hidden absolute left-4 z-40 text-text', defaultMenuOpen ? 'md:hidden' : 'md:block' ]"
       style="top: 8px"
     >
-      <Bars3Icon class="h-6 w-6 cursor-pointer transform hover:scale-110 duration-300" />
+      <i class="pi pi-bars text-2xl cursor-pointer transform hover:scale-110 duration-300" />
     </button>
 
   
@@ -252,13 +242,12 @@ onMounted(() => {
           @mouseleave="isHoverCloseMenuOnMobileIcon = false"
         >
            <transition name="fade" mode="out-in">
-            <component 
-              :is="isHoverCloseMenuOnMobileIcon ? PaperAirplaneIconSolid : PaperAirplaneIcon" 
-              :class="[
-                'h-4.5 w-4.5 transform rotate-180 !duration-100',
-                isHoverCloseMenuOnMobileIcon ? 'text-primary' : 'text-gray-600'
-              ]"
-            />
+              <i 
+                :class="[
+                  'pi pi-send text-xl transform rotate-180 !duration-100',
+                  isHoverCloseMenuOnMobileIcon ? 'text-primary' : 'text-gray-600'
+                ]"
+              ></i>
           </transition>
         </button>
 
@@ -282,8 +271,8 @@ onMounted(() => {
                     <MenuVoice
                           menuVoice="Settings"
                           route="/settings"
-                          :icon="Cog6ToothIcon"
-                          :iconSolid="Cog6ToothIconSolid"
+                          icon="pi-cog"
+                          iconSolid="pi-cog"
                            @click="closeSubMenu"
                         />
                 </div>
@@ -297,7 +286,7 @@ onMounted(() => {
              :class="isSubMenuVisible ? 'translate-x-0' : 'translate-x-full'"
            >
               <button @click="closeSubMenu" class="flex items-center text-gray-500 mb-6 cursor-pointer">
-                 <ChevronLeftIcon class="h-5 w-5 mr-1 ml-5" /> Indietro
+                 <i class="pi pi-chevron-left mr-1 ml-5" /> Indietro
               </button>
                <h3 class="text-lg font-bold text-gray-800 mb-6 text-center">{{ activeSubMenu?.name }}</h3>
                
@@ -331,7 +320,7 @@ onMounted(() => {
       style="top: 8px"
       @click="closeBottomSheet"
     >
-      <Cog6ToothIcon class="h-6 w-6 cursor-pointer transform hover:scale-110 duration-300" />
+      <i class="pi pi-cog text-2xl cursor-pointer transform hover:scale-110 duration-300" />
     </RouterLink>
 
     <transition name="fade">
@@ -352,7 +341,7 @@ onMounted(() => {
          <div class="flex flex-col">
             <div class="flex justify-end">
               <button @click="closeBottomSheet" class="text-gray-400 hover:text-gray-600">
-                  <XMarkIcon class="h-6 w-6" />
+                  <i class="pi pi-times text-2xl" />
               </button>
             </div>
           
@@ -414,7 +403,7 @@ onMounted(() => {
             :to="{ path: '/addmodifytransaction', query: { new: '1' } }"
             class="flex-shrink-0 w-14 h-14 -mt-8 flex items-center justify-center rounded-full bg-primary text-white shadow-xl  z-50"
           >
-            <PlusIcon class="w-8 h-8" />
+            <i class="pi pi-plus text-3xl" />
           </RouterLink>
 
           <div class="flex flex-1 justify-around">

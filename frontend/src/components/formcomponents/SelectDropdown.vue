@@ -1,6 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
-import { ChevronDownIcon, CheckIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import CreateCategoryModal from '@/components/modals/CreateCategoryModal.vue'
 import CreateAccountModal from '@/components/modals/CreateAccountModal.vue'
 
@@ -104,7 +103,7 @@ onUnmounted(() => {
 
       <div class="flex items-center gap-2">
         <button v-if="selectedItem && props.clearable" @click.stop="clearSelection" type="button" class="text-gray-400 hover:text-gray-600 px-1">×</button>
-        <ChevronDownIcon :class="['h-5 w-5 transition-transform', open ? 'rotate-180' : 'rotate-0']" />
+        <i :class="['pi pi-chevron-down text-sm transition-transform', open ? 'rotate-180' : 'rotate-0']" />
       </div>
     </button>
 
@@ -124,14 +123,14 @@ onUnmounted(() => {
               <span v-if="props.showColor && item.color" :style="{ backgroundColor: item.color }" class="w-3.5 h-3.5 rounded-full inline-block"></span>
               <span class="text-sm text-text">{{ item[props.itemLabel] }}</span>
             </div>
-            <span v-if="selectedItem && (selectedItem.id === item.id || selectedItem.nome === item.nome)" class="text-primary"><CheckIcon class="h-4 w-4" /></span>
+            <span v-if="selectedItem && (selectedItem.id === item.id || selectedItem.nome === item.nome)" class="text-primary"><i class="pi pi-check text-xs" /></span>
           </li>
         </ul>
 
         <div v-if="props.allowCreateCategory || props.allowCreateAccount" class="group p-2 border-t border-gray-100 flex items-center justify-center">
           <div class="flex items-center justify-center gap-2  text-sm text-text">
             <button type="button" @click.stop="showCreateModal = true" class=" cursor-pointer flex items-center gap-2 justify-center transition-colors hover:bg-primary/10 rounded-lg px-3 py-2">
-                <PlusIcon class="h-4 w-4" />
+                <i class="pi pi-plus text-xs" />
                 <span>{{ props.allowCreateCategory ? 'Crea nuova categoria' : 'Crea nuovo conto' }}</span>
             </button>
           </div>

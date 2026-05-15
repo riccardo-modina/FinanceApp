@@ -2,7 +2,6 @@
 import { ref, computed, onMounted } from 'vue';
 import MainComponent from '@/components/maincomponents/MainComponent.vue';
 import { useFinancialsStore } from '@/stores/financials';
-import { PencilSquareIcon, TrashIcon, PlusIcon, TagIcon } from '@heroicons/vue/24/outline';
 import CreateCategoryModal from '@/components/modals/CreateCategoryModal.vue';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal.vue';
 import CategoriesList from '@/components/maincomponents/cashflow/categories/CategoriesList.vue';

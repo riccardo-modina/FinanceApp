@@ -1,6 +1,5 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { XMarkIcon } from '@heroicons/vue/24/outline'
 import { getMonthlyStats } from '../../apicalls/apiCalls'
 import MonthlyNetChart from '../cards/charts/types/MonthlyNetChart.vue'
 import CumulativeExpIncChart from '../cards/charts/types/CumulativeExpIncChart.vue'
@@ -79,7 +78,7 @@ onUnmounted(() => {
                 @click="emit('close')"
                 class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
               >
-                <XMarkIcon class="h-8 w-8" />
+                <i class="pi pi-times text-2xl" />
               </button>
             </div>
 

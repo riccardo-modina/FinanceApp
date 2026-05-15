@@ -1,7 +1,5 @@
 <script setup>
 import { ref, onBeforeUnmount, watch, nextTick, onMounted, onUnmounted} from 'vue'
-import { CalendarDateRangeIcon } from '@heroicons/vue/24/outline'
-import { CalendarDateRangeIcon as CalendarDateRangeIconSolid } from '@heroicons/vue/24/solid'
 import YearMonthChooser from './YearMonthChooser.vue'
 import PrimaryButton from '@/components/buttons/primarybuttons/PrimaryButton.vue';
 
@@ -127,12 +125,7 @@ onBeforeUnmount(() => {
         aria-haspopup="menu"
         class="h-8 w-25 flex gap-2 items-center justify-center px-3 font-medium"
     >
-      <transition name="fade" mode="out-in">
-        <component 
-          :is="isHoverSelectDateIcon ? CalendarDateRangeIconSolid : CalendarDateRangeIcon" 
-          class="h-5 w-5 transition duration-100"
-        />
-      </transition>
+      <i class="pi pi-calendar text-lg" />
       {{buttonDesc}}
     </PrimaryButton>
 

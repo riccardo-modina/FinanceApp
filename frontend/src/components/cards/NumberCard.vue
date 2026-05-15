@@ -10,7 +10,7 @@ const props = defineProps({
     type: [String, Number],
     required: true
   },
-  icon: [Object, Function],
+  icon: String,
   color: {
     type: String,
     default: "bg-white"
@@ -96,7 +96,7 @@ const formattedCurrency = computed(() => {
           iconContainerClass
         ]"
       >
-        <component :is="icon" class="h-6 w-6" />
+        <i :class="['pi', icon, 'text-xl']" />
       </div>
     </div>
 

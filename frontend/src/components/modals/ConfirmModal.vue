@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
-import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 
 const props = defineProps({
   show: Boolean,
@@ -44,7 +43,7 @@ onUnmounted(() => {
               @click="emit('cancel')"
               class="hidden md:block absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
             >
-              <XMarkIcon class="h-5 w-5" />
+              <i class="pi pi-times" />
             </button>
 
             <div class="p-8">
@@ -55,7 +54,7 @@ onUnmounted(() => {
                   type === 'danger' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'
                 ]"
               >
-                <ExclamationTriangleIcon class="w-8 h-8" />
+                <i class="pi pi-exclamation-triangle text-3xl" />
               </div>
 
               <!-- Text Content -->

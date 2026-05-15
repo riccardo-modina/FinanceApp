@@ -1,7 +1,6 @@
 <script setup>
 import PrimaryButton from '@/components/buttons/primarybuttons/PrimaryButton.vue';
 import { RouterLink } from 'vue-router';
-import { PlusIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
   to: { type: [String, Object], default: null }
@@ -14,7 +13,7 @@ const props = defineProps({
     :as="to ? RouterLink : 'button'"
     :to="to"
   >
-    <PlusIcon class="w-5 h-5 group-hover:rotate-90 duration-500" />
+    <i class="pi pi-plus group-hover:rotate-90 duration-500" />
     <slot />
   </PrimaryButton>
 </template>

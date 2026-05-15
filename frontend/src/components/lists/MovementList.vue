@@ -3,7 +3,6 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import BaseButton from '@/components/buttons/BaseButton.vue';
 import { formatAmount } from '@/helpers/dateUtils';
 import VirtualScroller from 'primevue/virtualscroller';
-import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     movements: {
@@ -92,7 +91,7 @@ const itemSize = computed(() => windowWidth.value < 768 ? 105 : 120);
                                 @click="$emit('modify', mv)"
                                 title="Modifica"
                             >
-                                <PencilSquareIcon class="h-5 w-5" />
+                                <i class="pi pi-pencil h-5 w-5 flex items-center justify-center" />
                             </BaseButton>
                             <BaseButton 
                                 as="button"
@@ -100,7 +99,7 @@ const itemSize = computed(() => windowWidth.value < 768 ? 105 : 120);
                                 @click="$emit('delete', mv)"
                                 title="Elimina"
                             >
-                                <TrashIcon class="h-5 w-5" />
+                                <i class="pi pi-trash h-5 w-5 flex items-center justify-center" />
                             </BaseButton>
                         </div>
                     </div>
@@ -137,14 +136,14 @@ const itemSize = computed(() => windowWidth.value < 768 ? 105 : 120);
                                     class="p-1 text-gray-400"
                                     @click="$emit('modify', mv)"
                                 >
-                                    <PencilSquareIcon class="h-5 w-5" />
+                                    <i class="pi pi-pencil h-5 w-5 flex items-center justify-center" />
                                 </BaseButton>
                                 <BaseButton 
                                     as="button"
                                     class="p-1 text-gray-400"
                                     @click="$emit('delete', mv)"
                                 >
-                                    <TrashIcon class="h-5 w-5" />
+                                    <i class="pi pi-trash h-5 w-5 flex items-center justify-center" />
                                 </BaseButton>
                             </div>
                         </div>

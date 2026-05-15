@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { CheckIcon, PlusCircleIcon } from '@heroicons/vue/24/outline'
+
 import { onBeforeRouteLeave } from 'vue-router'
 import { useFinancialsStore } from '@/stores/financials'
 import ConfirmModal from '../../modals/ConfirmModal.vue'
@@ -619,7 +619,7 @@ watch(
         <section class="flex-1 h-full justify-center overflow-auto">
             <div class = "flex flex-col p-4 gap-4 bg-white mt-10 mb-20 md:mb-6 rounded-[10px] min-h-40 shadow-sm">
                     <div class="flex items-center gap-2">
-                        <PlusCircleIcon class="h-6 w-6 text-primary" />
+                        <i class="pi pi-plus-circle text-primary text-xl" />
                         <h2 class="text-xl font-bold text-text">{{ isNewMovement ? 'Aggiungi Movimento' : 'Modifica Movimento' }}</h2>
                     </div>
 
@@ -848,7 +848,7 @@ watch(
                         Salvataggio...
                       </template>
                       <template v-else>
-                        <CheckIcon class="h-5 w-5" />
+                        <i class="pi pi-check text-lg" />
                         Salva Movimento
                       </template>
                     </button>

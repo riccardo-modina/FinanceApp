@@ -9,7 +9,6 @@ import BaseButton from '@/components/buttons/BaseButton.vue';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useFinancialsStore } from '@/stores/financials';
-import { formatAmount } from '@/helpers/dateUtils';
 
 const props = defineProps({
     desc: {
@@ -50,7 +49,6 @@ const props = defineProps({
     }
 })
 
-import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 
 const emit = defineEmits(['delete-movement', 'load-more', 'filter-category']);
 
@@ -132,7 +130,7 @@ function onLoadMore() {
 
                         <!-- Alert for unclassified movements -->
                         <div v-if="unclassifiedCount > 0" class="bg-amber-50 border-l-4 border-amber-400 p-4 mb-2 flex items-start gap-3 rounded-r-md shadow-sm">
-                            <ExclamationTriangleIcon class="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
+                            <i class="pi pi-exclamation-triangle h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
                             <div>
                                 <p class="text-sm text-amber-800 font-medium">
                                     Attenzione: Ci sono {{ unclassifiedCount }} movimenti da classificare.
