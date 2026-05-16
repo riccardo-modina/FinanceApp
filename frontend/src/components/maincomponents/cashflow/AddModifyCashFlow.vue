@@ -474,11 +474,6 @@ function submitForm() {
   form.value.title = form.value.title.trim()
   form.value.description = form.value.description.trim()
 
-  if (!form.value.title) {
-    validationError.value = 'Inserisci un titolo per il movimento'
-    triggerShake('title')
-    return
-  }
   if (!form.value.amount && form.value.amount !== 0) {
     validationError.value = 'Inserisci un importo valido'
     triggerShake('amount')
@@ -499,6 +494,10 @@ function submitForm() {
   if (!form.value.category) {
     validationError.value = 'Seleziona una categoria'
     return
+  }
+
+  if (!form.value.title) {
+    form.value.title = selectedCategoryName.value || 'Nuovo Movimento'
   }
   if (!form.value.account) {
     validationError.value = 'Seleziona un conto'
@@ -680,28 +679,7 @@ watch(
                     </div>
 
 
-                    <div class="flex flex-col gap-1">
-                      <label class="text-sm font-semibold text-text text-center md:text-left flex items-center gap-2">
-                        Titolo
-                        <span :class="['text-[10px] font-normal transition-colors', form.title.length >= 50 ? 'text-red-500 font-bold' : 'text-gray-400']">
-                          ({{ form.title.length }}/50)
-                          <span v-if="form.title.length >= 50"> - Limite raggiunto!</span>
-                        </span>
-                      </label>
-                      <input
-                          v-model="form.title"
-                          maxlength="50"
-                          type="text"
-                          @keydown="(e) => { if (form.title.length >= 50 && e.key.length === 1) triggerShake('title') }"
-                          placeholder="es. Spesa settimanale"
-                          :class="[
-                            'px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light transition-all',
-                            { 'animate-shake border-red-400': shakeTitle || validationError === 'Inserisci un titolo per il movimento' },
-                            { 'border-red-400 bg-red-50': validationError === 'Inserisci un titolo per il movimento' }
-                          ]"
-                      />
-                      <InputError :message="validationError === 'Inserisci un titolo per il movimento' ? 'Inserisci un titolo per il movimento' : ''" />
-                    </div>
+
 
                     <div class="flex flex-col gap-1">
                     <label class="text-sm font-semibold text-text text-center md:text-left">Importo ({{ props.currency }})</label>
@@ -808,6 +786,27 @@ watch(
                     </div>
 
                     <div class="flex flex-col gap-1">
+                      <label class="text-sm font-semibold text-text text-center md:text-left flex items-center gap-2">
+                        Titolo
+                        <span :class="['text-[10px] font-normal transition-colors', form.title.length >= 50 ? 'text-red-500 font-bold' : 'text-gray-400']">
+                          ({{ form.title.length }}/50)
+                          <span v-if="form.title.length >= 50"> - Limite raggiunto!</span>
+                        </span>
+                      </label>
+                      <input
+                          v-model="form.title"
+                          maxlength="50"
+                          type="text"
+                          @keydown="(e) => { if (form.title.length >= 50 && e.key.length === 1) triggerShake('title') }"
+                          placeholder="es. Acquisto Libri (opzionale, se vuoto verrà derivato dalla categoria)"
+                          :class="[
+                            'px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light transition-all',
+                            { 'animate-shake border-red-400': shakeTitle }
+                          ]"
+                      />
+                    </div>
+
+                    <div class="flex flex-col gap-1">
                     <label class="text-sm font-semibold text-text text-center md:text-left flex items-center gap-2">
                       Descrizione
                       <span :class="['text-[10px] font-normal transition-colors', form.description.length >= 200 ? 'text-red-500 font-bold' : 'text-gray-400']">
@@ -828,7 +827,7 @@ watch(
                     ></textarea>
                     </div>
 
-                    <div v-if="validationError && !['Seleziona prima il tipo di movimento', 'Inserisci un titolo per il movimento', 'Seleziona una categoria', 'Seleziona un conto'].includes(validationError)" class="bg-red-50 text-red-600 p-3 rounded-md text-sm font-medium border border-red-100">
+                    <div v-if="validationError && !['Seleziona prima il tipo di movimento', 'Seleziona una categoria', 'Seleziona un conto'].includes(validationError)" class="bg-red-50 text-red-600 p-3 rounded-md text-sm font-medium border border-red-100">
                       {{ validationError }}
                     </div>
 
