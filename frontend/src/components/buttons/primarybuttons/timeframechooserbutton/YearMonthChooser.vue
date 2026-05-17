@@ -90,6 +90,14 @@ function confirmMonthYear(date) {
     })
   }
 }
+
+function changeMode(newMode) {
+  if (mode.value !== newMode) {
+    mode.value = newMode;
+    selectedDate.value = null;
+    timeFrameError.value = false;
+  }
+}
 </script>
 
 <template>
@@ -99,14 +107,14 @@ function confirmMonthYear(date) {
       <button
         class="px-4 py-2 rounded-lg text-sm font-medium cursor-pointer hover:bg-primary-clear"
         :class="mode === 'year' ? 'bg-primary text-white' : ' text-gray-600'"
-        @click="mode = 'year'"
+        @click="changeMode('year')"
       >
         Seleziona Anno
       </button>
       <button
         class="px-4 py-2 rounded-lg cursor-pointer hover:bg-primary-clear text-sm font-medium"
         :class="mode === 'monthYear' ? 'bg-primary text-white' : ' text-gray-600'"
-        @click="mode = 'monthYear'"
+        @click="changeMode('monthYear')"
       >
         Seleziona Mese/Anno
       </button>
@@ -120,7 +128,7 @@ function confirmMonthYear(date) {
         :view="mode === 'year' ? 'year' : 'month'"
         :dateFormat="mode === 'year' ? 'yy' : 'mm/yy'"
         append-to="body"
-        :placeholder="props.timeFrame === 'Totale' ? 'Totale' : (mode === 'year' ? 'Seleziona Anno' : 'Mese/Anno')"
+        :placeholder="mode === 'year' ? 'Seleziona Anno' : 'Seleziona Mese/Anno'"
         @update:modelValue="mode === 'year' ? confirmYear($event) : confirmMonthYear($event)"
         input-class="w-full px-3 py-2 focus:outline-none text-center text-lg font-medium cursor-pointer bg-primary-light/80 border border-gray-200 rounded-lg shadow-sm"
         :pt="{
