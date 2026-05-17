@@ -16,7 +16,7 @@
 To install and set up the project instantly, run:
 
 ```bash
-curl -sSL "https://raw.githubusercontent.com/GodzillaWasTaken/FinanceApp/main/install.sh" | bash
+curl -sSL "https://raw.githubusercontent.com/riccardo-modina/FinanceApp/main/install.sh" | bash
 ```
 
 This will download the necessary `docker-compose.yml` and `.env` files. Fill in the `.env` with your database credentials.
@@ -37,4 +37,4 @@ Since PiggyPath is a PWA, you can add it to your home screen:
 
 ---
 
-Built by [GodzillaWasTaken](https://github.com/GodzillaWasTaken)
+Built by [riccardomodina](https://github.com/riccardo-modina)
