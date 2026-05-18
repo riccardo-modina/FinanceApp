@@ -30,15 +30,6 @@ services:
     networks:
       - finance_internal
 
-  adminer:
-    image: adminer
-    ports:
-      - "8081:8080"
-    depends_on:
-      - database
-    networks:
-      - finance_internal
-
 volumes:
   postgres_data_financeapp:
 
