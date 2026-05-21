@@ -551,6 +551,20 @@ const formattedDate = computed(() => {
   return `${yyyy}-${mm}-${dd}`
 })
 
+const humanReadableDate = computed(() => {
+  if (!form.value.date) return ''
+  try {
+    return new Date(form.value.date).toLocaleDateString('it-IT', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    })
+  } catch (e) {
+    return String(form.value.date)
+  }
+})
+
+
 
 // Add a normalized "today" (midnight) for comparisons and DatePicker max binding
 const today = new Date()
@@ -623,11 +637,14 @@ watch(
 </script>
 
 <template>
-        <section class="flex-1 h-full justify-center overflow-auto">
-            <div class = "flex flex-col p-4 gap-4 bg-white mt-10 mb-20 md:mb-6 rounded-[10px] min-h-40 shadow-sm">
-                    <div class="flex items-center gap-2">
-                        <i class="pi pi-plus-circle text-primary text-xl" />
-                        <h2 class="text-xl font-bold text-text">{{ isNewMovement ? 'Aggiungi Movimento' : 'Modifica Movimento' }}</h2>
+        <section class="flex-1 h-full justify-center overflow-auto px-1">
+            <div class="flex flex-col gap-4 mt-6 mb-10 md:mb-6 max-w-xl mx-auto w-full">
+                    <div class="flex flex-col gap-1 pb-2 px-1">
+                        <div class="flex items-center gap-2">
+                            <i class="pi pi-plus-circle text-primary text-xl" />
+                            <h2 class="text-xl font-bold text-text">{{ isNewMovement ? 'Aggiungi Movimento' : 'Modifica Movimento' }}</h2>
+                        </div>
+                        <p class="text-xs text-gray-500">Registra una nuova entrata o spesa</p>
                     </div>
 
                     <!-- wrap fields in a native form to enable browser required validation -->
@@ -640,225 +657,301 @@ watch(
                       <input type="text" v-model="selectedAccountName" aria-hidden="true"
                              style="position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;"/>
 
-                    <div class="flex flex-col gap-1">
-                        <label class="text-sm font-semibold text-text text-center md:text-left">Data</label>
-                            <button @click="openDatePicker" type="button" class="w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light text-left cursor-pointer">
-                                <div class="relative max-w-80">
-                                    <DatePicker
-                                        ref="datepickerRef"
-                                        v-model="form.date"
-                                        :maxDate="today"
-                                        append-to="body"
-                                        dateFormat="dd/mm/yy"
-                                        input-class="w-full px-3 py-2 focus:outline-none"
-                                        :pt="{
-                                            panel: 'flex-1 bg-white shadow-md border border-gray-200 rounded-xl p-3 mt-4',
-                                            header: 'flex justify-between items-center text-text mb-2',
-                                            title: 'text-md flex items-center gap-1',
-                                            prevbutton: 'text-gray-500 hover:text-primary hover:bg-gray-100 rounded p-1 transition',
-                                            nextbutton: 'text-gray-500 hover:text-primary hover:bg-gray-100 rounded p-1 transition',
-                                            month: 'flex-1 px-2 py-1 hover:bg-primary hover:text-white rounded cursor-pointer transition m-4',
-                                            monthSelected: 'bg-primary text-white font-bold rounded',
-                                            year: 'flex-1 px-2 py-1 hover:bg-primary hover:text-white rounded cursor-pointer transition m-4',
-                                            yearSelected: 'bg-primary text-white font-bold rounded',
-                                            day: ({ context }) => [
-                                                'w-10.5 h-9 flex items-center justify-center text-sm rounded cursor-pointer transition',
-                                                
-                                                { 
-                                                    'hover:bg-primary-light hover:text-white': !context.selected && !context.disabled && !context.dayOtherMonth,
-                                                    'text-gray-500 cursor-not-allowed': context.dayOtherMonth,
-                                                    'border border-primary text-primary font-semibold bg-primary/20': context.dayToday && !context.selected,
-                                                    'bg-primary-light text-white font-bold rounded-full hover:bg-primary': context.selected,
-                                                    'text-gray-300 cursor-not-allowed opacity-50': context.disabled && !context.dayOtherMonth
-                                                }
-                                            ],
-                                        }"
-                                        />
-                                 </div>
+                      <!-- CARD 1: Tipo Movimento -->
+                      <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                            <i class="pi pi-sync text-lg" />
+                          </div>
+                          <span class="text-sm font-semibold text-text">Tipo Movimento</span>
+                        </div>
+                        
+                        <!-- Mobile: Buttons -->
+                        <div class="flex gap-2 md:hidden mt-1">
+                          <button 
+                            v-for="type in movementTypes"
+                            :key="type.id"
+                            type="button" 
+                            @click="setMovementType(type.id)"
+                            :class="[
+                              'flex-1 py-2.5 px-4 rounded-xl border transition-all text-sm font-semibold cursor-pointer flex items-center justify-center gap-2',
+                              form.movementType === type.id 
+                                ? type.id === 'entrata'
+                                  ? 'bg-green-50 text-green-700 border-green-200 shadow-sm scale-[1.02]'
+                                  : type.id === 'uscita'
+                                    ? 'bg-red-50 text-red-700 border-red-200 shadow-sm scale-[1.02]'
+                                    : 'bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm scale-[1.02]'
+                                : 'bg-white text-gray-500 border-gray-100 hover:bg-gray-50'
+                            ]"
+                          >
+                            <i :class="[
+                              'pi text-xs',
+                              type.id === 'entrata' ? 'pi-arrow-down-left' : type.id === 'uscita' ? 'pi-arrow-up-right' : 'pi-sync'
+                            ]" />
+                            {{ type.label }}
+                          </button>
+                        </div>
 
-                                <!-- warning shown when user attempts to pick a future date -->
-                                <InputError 
-                                  :message="showFutureWarning ? 'Non è possibile selezionare una data futura — impostata la data di oggi.' : ''"
-                                  type="error"
-                                  :animate="true"
+                        <!-- Desktop: Dropdown -->
+                        <div class="hidden md:block">
+                          <SelectDropdown
+                            :items="movementTypes"
+                            v-model="form.movementType"
+                            itemLabel="label"
+                            placeholder="Seleziona tipo movimento"
+                            :searchEnabled="false"
+                            :clearable="false"
+                            :showColor="true"
+                            @select="(val) => setMovementType(val.id)"
+                          />
+                        </div>
+                      </div>
+
+                      <!-- CARD 2: Categoria -->
+                      <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                            <i class="pi pi-tag text-lg" />
+                          </div>
+                          <span class="text-sm font-semibold text-text">Categoria</span>
+                        </div>
+                        <div class="relative group mt-1">
+                          <SelectDropdown
+                            :items="filteredCategories"
+                            v-model="form.category"
+                            itemLabel="nome"
+                            :showColor="true"
+                            :placeholder="!form.movementType ? 'Seleziona prima il tipo di movimento (Es. Spesa, Entrata, Giroconto)' : 'Seleziona categoria'"
+                            @select="onCategorySelect"
+                            @clear="onCategoryClear"
+                            :required="true"
+                            :allowCreateCategory="true"
+                            :initialType="form.movementType"
+                            :disabled="!form.movementType"
+                            @item-created="(c) => emit('newCategoryCreated', c)"
+                          />
+                          <div v-if="!form.movementType" class="absolute inset-0 z-10 cursor-not-allowed" @click="validationError = 'Seleziona prima il tipo di movimento'"></div>
+                        </div>
+                        <InputError 
+                          :message="validationError === 'Seleziona prima il tipo di movimento' ? 'Per favore, seleziona prima se è una Spesa, un\'Entrata o un Giroconto' : ''" 
+                          :animate="true"
+                        />
+                        <InputError :message="validationError === 'Seleziona una categoria' ? 'Seleziona una categoria' : ''" />
+                      </div>
+
+                      <!-- CARD 3: Descrizione (Titolo) -->
+                      <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                              <i class="pi pi-pencil text-lg" />
+                            </div>
+                            <div class="flex items-baseline gap-1.5">
+                              <span class="text-sm font-semibold text-text">Descrizione</span>
+                              <span class="text-xs text-gray-400 font-normal">(opzionale)</span>
+                            </div>
+                          </div>
+                          <span :class="['text-[10px] font-normal transition-colors', form.title.length >= 50 ? 'text-red-500 font-bold' : 'text-gray-400']">
+                            {{ form.title.length }}/50
+                          </span>
+                        </div>
+                        <div class="mt-1 relative">
+                          <input
+                              v-model="form.title"
+                              maxlength="50"
+                              type="text"
+                              @keydown="(e) => { if (form.title.length >= 50 && e.key.length === 1) triggerShake('title') }"
+                              placeholder="es. Acquisto Libri (opzionale, se vuoto verrà derivato dalla categoria)"
+                              :class="[
+                                'w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-light transition-all text-sm bg-gray-50/50 hover:bg-gray-50 focus:bg-white',
+                                { 'animate-shake border-red-400': shakeTitle }
+                              ]"
+                          />
+                          <span v-if="form.title.length >= 50" class="text-[10px] text-red-500 mt-1 block">Limite raggiunto!</span>
+                        </div>
+                      </div>
+
+                      <!-- CARD 4: Importo -->
+                      <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                            <i class="pi pi-wallet text-lg" />
+                          </div>
+                          <span class="text-sm font-semibold text-text">Importo</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between gap-4 mt-2">
+                          <div class="flex-1 relative">
+                            <input
+                              type="text"
+                              :value="displayValue"
+                              @input="onAmountInput"
+                              @focus="onFocus"
+                              @blur="onBlur"
+                              inputmode="decimal"
+                              placeholder="0.00"
+                              autocomplete="off"
+                              data-1p-ignore="true"
+                              data-lpignore="true"
+                              :class="[
+                                'w-full text-4xl font-semibold bg-transparent border-none outline-none focus:ring-0 focus:outline-none p-0 text-text transition-all',
+                                { 'text-red-600': form.amount > 10000000 || showZeroError },
+                                { 'animate-shake': shakeAmount }
+                              ]"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div class="flex flex-col mt-1 border-t border-gray-50 pt-2 gap-1">
+                          <InputError :message="showNumericError ? 'Sono consentiti solo numeri e un separatore decimale' : ''" type="warning" />
+                          <InputError :message="showDecimalError ? 'Massimo 4 cifre decimali consentite' : ''" type="warning" />
+                          <InputError :message="showZeroError ? 'L\'importo deve essere maggiore di zero' : ''" />
+                          <InputError :message="showLimitError ? 'Limite massimo di 10M superato!' : ''" />
+                          <span class="text-[11px] text-gray-400 font-normal">Max: 10.000.000 {{ props.currency }}</span>
+                        </div>
+                      </div>
+
+                      <!-- CARD 5: Data -->
+                      <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3">
+                        <button @click="openDatePicker" type="button" class="w-full text-left cursor-pointer focus:outline-none group">
+                          <div class="flex items-center justify-between w-full">
+                            <div class="flex items-center gap-3">
+                              <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+                                <i class="pi pi-calendar text-lg" />
+                              </div>
+                              <div class="flex flex-col">
+                                <span class="text-sm font-semibold text-text">Data</span>
+                                <span class="text-base text-gray-600 font-medium mt-0.5">{{ humanReadableDate || 'Seleziona data' }}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="relative h-0 overflow-hidden opacity-0 pointer-events-none">
+                            <DatePicker
+                                ref="datepickerRef"
+                                v-model="form.date"
+                                :maxDate="today"
+                                append-to="body"
+                                dateFormat="dd/mm/yy"
+                                input-class="focus:outline-none"
+                                :pt="{
+                                    panel: 'flex-1 bg-white shadow-md border border-gray-200 rounded-xl p-3 mt-4',
+                                    header: 'flex justify-between items-center text-text mb-2',
+                                    title: 'text-md flex items-center gap-1',
+                                    prevbutton: 'text-gray-500 hover:text-primary hover:bg-gray-100 rounded p-1 transition',
+                                    nextbutton: 'text-gray-500 hover:text-primary hover:bg-gray-100 rounded p-1 transition',
+                                    month: 'flex-1 px-2 py-1 hover:bg-primary hover:text-white rounded cursor-pointer transition m-4',
+                                    monthSelected: 'bg-primary text-white font-bold rounded',
+                                    year: 'flex-1 px-2 py-1 hover:bg-primary hover:text-white rounded cursor-pointer transition m-4',
+                                    yearSelected: 'bg-primary text-white font-bold rounded',
+                                    day: ({ context }) => [
+                                        'w-10.5 h-9 flex items-center justify-center text-sm rounded cursor-pointer transition',
+                                        
+                                        { 
+                                            'hover:bg-primary-light hover:text-white': !context.selected && !context.disabled && !context.dayOtherMonth,
+                                            'text-gray-500 cursor-not-allowed': context.dayOtherMonth,
+                                            'border border-primary text-primary font-semibold bg-primary/20': context.dayToday && !context.selected,
+                                            'bg-primary-light text-white font-bold rounded-full hover:bg-primary': context.selected,
+                                            'text-gray-300 cursor-not-allowed opacity-50': context.disabled && !context.dayOtherMonth
+                                        }
+                                    ],
+                                }"
                                 />
-
-                            </button>
-                    </div>
-
-
-
-
-                    <div class="flex flex-col gap-1">
-                    <label class="text-sm font-semibold text-text text-center md:text-left">Importo ({{ props.currency }})</label>
-                    <input
-                      type="text"
-                      :value="displayValue"
-                      @input="onAmountInput"
-                      @focus="onFocus"
-                      @blur="onBlur"
-                      inputmode="decimal"
-                      placeholder="0.00 (max 10M)"
-                      :class="[
-                        'px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light transition-all',
-                        { 'text-red-600 border-red-300 bg-red-50': form.amount > 10000000 || showZeroError },
-                        { 'animate-shake border-red-400': shakeAmount }
-                      ]"
-                    />
-                    <div class="flex flex-col mt-1">
-                      <InputError :message="showNumericError ? 'Sono consentiti solo numeri e un separatore decimale' : ''" type="warning" />
-                      <InputError :message="showDecimalError ? 'Massimo 4 cifre decimali consentite' : ''" type="warning" />
-                      <InputError :message="showZeroError ? 'L\'importo deve essere maggiore di zero' : ''" />
-                      <InputError :message="showLimitError ? 'Limite massimo di 10M superato!' : ''" />
-                      <span class="text-[10px] text-gray-500 mt-0.5">Usa il punto (.) o la virgola (,) per i decimali.</span>
-                    </div>
-                    </div>
-
-                    <div class="flex flex-col gap-1">
-                      <label class="text-sm font-semibold text-text text-center md:text-left">Tipo Movimento</label>
-                      
-                      <!-- Mobile: Buttons -->
-                      <div class="flex gap-2 md:hidden">
-                        <button 
-                          v-for="type in movementTypes"
-                          :key="type.id"
-                          type="button" 
-                          @click="setMovementType(type.id)"
-                          :class="[
-                            'flex-1 py-2 px-4 rounded-md border transition-all text-sm font-medium cursor-pointer',
-                            form.movementType === type.id 
-                              ? `${type.bgClass} text-white ${type.borderClass} shadow-sm` 
-                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                          ]"
-                        >
-                          {{ type.label }}
+                          </div>
                         </button>
-                      </div>
-
-                      <!-- Desktop: Dropdown -->
-                      <div class="hidden md:block">
-                        <SelectDropdown
-                          :items="movementTypes"
-                          v-model="form.movementType"
-                          itemLabel="label"
-                          placeholder="Seleziona tipo movimento"
-                          :searchEnabled="false"
-                          :clearable="false"
-                          :showColor="true"
-                          @select="(val) => setMovementType(val.id)"
+                        
+                        <InputError 
+                          :message="showFutureWarning ? 'Non è possibile selezionare una data futura — impostata la data di oggi.' : ''"
+                          type="error"
+                          :animate="true"
                         />
                       </div>
-                    </div>
 
-                    <div class="flex flex-col gap-1">
-                      <label class="text-sm font-semibold text-text text-center md:text-left">Categoria</label>
-                      <div class="relative group">
-                        <SelectDropdown
-                          :items="filteredCategories"
-                          v-model="form.category"
-                          itemLabel="nome"
-                          :showColor="true"
-                          :placeholder="!form.movementType ? 'Seleziona prima il tipo di movimento (Es. Uscita, Entrata, Giroconto)' : 'Seleziona categoria'"
-                          @select="onCategorySelect"
-                          @clear="onCategoryClear"
-                          :required="true"
-                          :allowCreateCategory="true"
-                          :initialType="form.movementType"
-                          :disabled="!form.movementType"
-                          @item-created="(c) => emit('newCategoryCreated', c)"
-                        />
-                        <div v-if="!form.movementType" class="absolute inset-0 z-10 cursor-not-allowed" @click="validationError = 'Seleziona prima il tipo di movimento'"></div>
+                      <!-- CARD 6: Conto -->
+                      <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                            <i class="pi pi-credit-card text-lg" />
+                          </div>
+                          <span class="text-sm font-semibold text-text">Conto</span>
+                        </div>
+                        <div class="mt-1">
+                          <SelectDropdown
+                            :items="props.conti"
+                            v-model="form.account"
+                            itemLabel="nome"
+                            placeholder="Seleziona conto"
+                            :showColor="true"
+                            @select="onAccountSelect"
+                            @clear="onAccountClear"
+                            :required="true"
+                            :allowCreateAccount="true"
+                            @item-created="(a) => emit('newAccountCreated', a)"
+                          />
+                        </div>
+                        <InputError :message="validationError === 'Seleziona un conto' ? 'Seleziona un conto' : ''" />
                       </div>
-                      <InputError 
-                        :message="validationError === 'Seleziona prima il tipo di movimento' ? 'Per favore, seleziona prima se è una Spesa, un\'Entrata o un Giroconto' : ''" 
-                        :animate="true"
-                      />
-                      <InputError :message="validationError === 'Seleziona una categoria' ? 'Seleziona una categoria' : ''" />
-                    </div>
 
-                    <div class="flex flex-col gap-1">
-                      <label class="text-sm font-semibold text-text text-center md:text-left">Conto</label>
-                      <SelectDropdown
-                        :items="props.conti"
-                        v-model="form.account"
-                        itemLabel="nome"
-                        placeholder="Seleziona conto"
-                        :showColor="true"
-                        @select="onAccountSelect"
-                        @clear="onAccountClear"
-                        :required="true"
-                        :allowCreateAccount="true"
-                        @item-created="(a) => emit('newAccountCreated', a)"
-                      />
-                      <InputError :message="validationError === 'Seleziona un conto' ? 'Seleziona un conto' : ''" />
-                    </div>
+                      <!-- CARD 7: Note -->
+                      <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                              <i class="pi pi-file text-lg" />
+                            </div>
+                            <div class="flex items-baseline gap-1.5">
+                              <span class="text-sm font-semibold text-text">Note</span>
+                              <span class="text-xs text-gray-400 font-normal">(opzionale)</span>
+                            </div>
+                          </div>
+                          <span :class="['text-[10px] font-normal transition-colors', form.description.length >= 200 ? 'text-red-500 font-bold' : 'text-gray-400']">
+                            {{ form.description.length }}/200
+                          </span>
+                        </div>
+                        <div class="mt-1 relative">
+                          <textarea
+                              v-model="form.description"
+                              maxlength="200"
+                              rows="3"
+                              @keydown="(e) => { if (form.description.length >= 200 && e.key.length === 1) triggerShake('description') }"
+                              placeholder="Aggiungi note (opzionale)..."
+                              :class="[
+                                  'w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-light transition-all text-sm bg-gray-50/50 hover:bg-gray-50 focus:bg-white',
+                                  { 'animate-shake border-red-400': shakeDescription }
+                              ]"
+                          ></textarea>
+                          <span v-if="form.description.length >= 200" class="text-[10px] text-red-500 mt-1 block">Limite raggiunto!</span>
+                        </div>
+                      </div>
 
-                    <div class="flex flex-col gap-1">
-                      <label class="text-sm font-semibold text-text text-center md:text-left flex items-center gap-2">
-                        Titolo
-                        <span :class="['text-[10px] font-normal transition-colors', form.title.length >= 50 ? 'text-red-500 font-bold' : 'text-gray-400']">
-                          ({{ form.title.length }}/50)
-                          <span v-if="form.title.length >= 50"> - Limite raggiunto!</span>
-                        </span>
-                      </label>
-                      <input
-                          v-model="form.title"
-                          maxlength="50"
-                          type="text"
-                          @keydown="(e) => { if (form.title.length >= 50 && e.key.length === 1) triggerShake('title') }"
-                          placeholder="es. Acquisto Libri (opzionale, se vuoto verrà derivato dalla categoria)"
-                          :class="[
-                            'px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light transition-all',
-                            { 'animate-shake border-red-400': shakeTitle }
-                          ]"
-                      />
-                    </div>
+                      <!-- Validation Error -->
+                      <div v-if="validationError && !['Seleziona prima il tipo di movimento', 'Seleziona una categoria', 'Seleziona un conto'].includes(validationError)" class="bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-medium border border-red-100 shadow-sm">
+                        {{ validationError }}
+                      </div>
 
-                    <div class="flex flex-col gap-1">
-                    <label class="text-sm font-semibold text-text text-center md:text-left flex items-center gap-2">
-                      Descrizione
-                      <span :class="['text-[10px] font-normal transition-colors', form.description.length >= 200 ? 'text-red-500 font-bold' : 'text-gray-400']">
-                        ({{ form.description.length }}/200)
-                        <span v-if="form.description.length >= 200"> - Limite raggiunto!</span>
-                      </span>
-                    </label>
-                    <textarea
-                        v-model="form.description"
-                        maxlength="200"
-                        rows="3"
-                        @keydown="(e) => { if (form.description.length >= 200 && e.key.length === 1) triggerShake('description') }"
-                        placeholder="Aggiungi dettagli (opzionale)..."
+                      <!-- Submit Button -->
+                      <button
+                        type="submit"
+                        :disabled="isSubmitting"
                         :class="[
-                            'px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light transition-all',
-                            { 'animate-shake border-red-400': shakeDescription }
+                          'w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl transition duration-300 font-semibold shadow-md mt-2',
+                          isSubmitting 
+                            ? 'bg-gray-400 text-white cursor-not-allowed' 
+                            : 'bg-primary text-white hover:bg-primary-dark hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] cursor-pointer'
                         ]"
-                    ></textarea>
-                    </div>
-
-                    <div v-if="validationError && !['Seleziona prima il tipo di movimento', 'Seleziona una categoria', 'Seleziona un conto'].includes(validationError)" class="bg-red-50 text-red-600 p-3 rounded-md text-sm font-medium border border-red-100">
-                      {{ validationError }}
-                    </div>
-
-                    <button
-                      type="submit"
-                      :disabled="isSubmitting"
-                      :class="[
-                        'flex items-center justify-center gap-2 px-4 py-2 rounded-md transition duration-300',
-                        isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary-light text-white hover:bg-primary cursor-pointer'
-                      ]"
-                    >
-                      <template v-if="isSubmitting">
-                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Salvataggio...
-                      </template>
-                      <template v-else>
-                        <i class="pi pi-check text-lg" />
-                        Salva Movimento
-                      </template>
-                    </button>
+                      >
+                        <template v-if="isSubmitting">
+                          <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Salvataggio...
+                        </template>
+                        <template v-else>
+                          <i class="pi pi-check-circle text-lg" />
+                          {{ isNewMovement ? 'Aggiungi Movimento' : 'Salva Movimento' }}
+                        </template>
+                      </button>
 
                     </form>
             </div>
