@@ -37,6 +37,13 @@ const filteredCategories = computed(() => {
   return (props.categorie || []).filter(c => c.tipo === form.value.movementType)
 })
 
+const titlePlaceholder = computed(() => {
+  if (selectedCategoryName.value) {
+    return `${selectedCategoryName.value} (da categoria)`
+  }
+  return 'es. Acquisto Libri (opzionale)'
+})
+
 const validationError = ref('')
 const isSubmitting = ref(false)
 const originalFormState = ref('')
@@ -438,17 +445,9 @@ function onCategorySelect(cat) {
   // cat is the full item object
   selectedCategoryName.value = cat.nome || ''
   form.value.category = cat.id || cat.nome
-  
-  // if title is empty, derive it from the selected category
-  if (!form.value.title || form.value.title.trim() === '') {
-    form.value.title = cat.nome || ''
-  }
 }
 
 function onCategoryClear() {
-  if (form.value.title === selectedCategoryName.value) {
-    form.value.title = ''
-  }
   selectedCategoryName.value = ''
   form.value.category = ''
 }
@@ -746,9 +745,9 @@ watch(
                             <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                               <i class="pi pi-pencil text-lg" />
                             </div>
-                            <div class="flex items-baseline gap-1.5">
+                            <div class="flex flex-col">
                               <span class="text-sm font-semibold text-text">Descrizione</span>
-                              <span class="text-xs text-gray-400 font-normal">(opzionale)</span>
+                              <span class="text-[11px] text-gray-400 font-normal">Se vuoto, rimarrà il nome della categoria</span>
                             </div>
                           </div>
                           <span :class="['text-[10px] font-normal transition-colors', form.title.length >= 50 ? 'text-red-500 font-bold' : 'text-gray-400']">
@@ -761,7 +760,7 @@ watch(
                               maxlength="50"
                               type="text"
                               @keydown="(e) => { if (form.title.length >= 50 && e.key.length === 1) triggerShake('title') }"
-                              placeholder="es. Acquisto Libri (opzionale, se vuoto verrà derivato dalla categoria)"
+                              :placeholder="titlePlaceholder"
                               :class="[
                                 'w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-light transition-all text-sm bg-gray-50/50 hover:bg-gray-50 focus:bg-white',
                                 { 'animate-shake border-red-400': shakeTitle }
