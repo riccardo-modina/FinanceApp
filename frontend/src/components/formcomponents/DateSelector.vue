@@ -180,6 +180,46 @@ watch(() => props.modelValue, (newVal) => {
   if (selectedDay.value !== day) selectedDay.value = day
 }, { immediate: true })
 
+// Native input date synchronization for mobile view
+const nativeDateStr = computed({
+  get() {
+    if (!props.modelValue) return ''
+    const d = new Date(props.modelValue)
+    if (isNaN(d.getTime())) return ''
+    const yyyy = d.getFullYear()
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    const dd = String(d.getDate()).padStart(2, '0')
+    return `${yyyy}-${mm}-${dd}`
+  },
+  set(val) {
+    if (!val) return
+    const parts = val.split('-') // YYYY-MM-DD
+    const newDate = new Date(parts[0], parts[1] - 1, parts[2])
+    emit('update:modelValue', newDate)
+  }
+})
+
+const todayStr = computed(() => {
+  const d = props.maxDate || new Date()
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
+})
+
+const formattedDateMobile = computed(() => {
+  if (!props.modelValue) return 'Seleziona data'
+  try {
+    return new Date(props.modelValue).toLocaleDateString('it-IT', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    })
+  } catch (e) {
+    return 'Seleziona data'
+  }
+})
+
 onMounted(() => {
   isMobile.value = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   document.addEventListener('click', handleClickOutside)
@@ -191,38 +231,26 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex gap-2 mt-1 w-full relative" @focusin="emit('focus')">
+  <div class="flex gap-1.5 md:gap-2 mt-1 w-full relative" @focusin="emit('focus')">
     
-    <!-- MOBILE VIEW: Native selects for system wheel scroller -->
+    <!-- MOBILE VIEW: Single native date picker overlay for iOS standard scroll wheel -->
     <template v-if="isMobile">
-      <!-- Giorno -->
-      <div class="flex-1 min-w-[70px]">
-        <select
-          v-model="selectedDay"
-          class="w-full px-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-light text-sm font-medium text-text cursor-pointer"
+      <div class="relative w-full">
+        <button 
+          type="button" 
+          class="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-gray-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-light text-sm font-semibold text-text flex items-center justify-between shadow-sm cursor-pointer min-h-[46px]"
         >
-          <option v-for="d in daysList" :key="d" :value="d">{{ d }}</option>
-        </select>
-      </div>
-
-      <!-- Mese -->
-      <div class="flex-[2] min-w-[120px]">
-        <select
-          v-model="selectedMonth"
-          class="w-full px-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-light text-sm font-medium text-text cursor-pointer"
-        >
-          <option v-for="m in monthsList" :key="m.value" :value="m.value">{{ m.name }}</option>
-        </select>
-      </div>
-
-      <!-- Anno -->
-      <div class="flex-1 min-w-[85px]">
-        <select
-          v-model="selectedYear"
-          class="w-full px-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-light text-sm font-medium text-text cursor-pointer"
-        >
-          <option v-for="y in yearsList" :key="y" :value="y">{{ y }}</option>
-        </select>
+          <span class="capitalize">{{ formattedDateMobile }}</span>
+          <i class="pi pi-calendar text-primary text-base" />
+        </button>
+        <!-- Overlay invisible HTML5 date input that opens native system picker wheel on tap -->
+        <input
+          type="date"
+          v-model="nativeDateStr"
+          :max="todayStr"
+          class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          style="font-size: 16px;" 
+        />
       </div>
     </template>
 
