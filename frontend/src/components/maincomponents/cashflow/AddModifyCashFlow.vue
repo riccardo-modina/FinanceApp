@@ -687,19 +687,19 @@ function handleCategorySelect(cat) {
                              style="position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;"/>
                       
                       <!-- SINGLE UNIFIED CARD WITH TIMELINE STEPPER -->
-                      <div class="bg-white rounded-3xl border border-gray-100 shadow-md p-5 md:p-8 relative">
+                      <div class="bg-white rounded-3xl border border-gray-100 shadow-md p-4 sm:p-6 md:p-8 relative">
                         
                         <!-- Stepper flex container (no absolute timeline on card parent) -->
                         <div class="flex flex-col gap-10 relative">
 
                           <!-- STEP 1: Movimento -->
-                          <div class="flex gap-4 md:gap-6 relative">
+                          <div class="flex gap-3 sm:gap-6 relative">
                             
                             <!-- Left Column: Badge and Timeline Line -->
-                            <div class="flex flex-col items-center relative w-8 flex-shrink-0 z-10">
+                            <div class="flex flex-col items-center relative w-6 sm:w-8 flex-shrink-0 z-10">
                               <!-- Badge -->
                               <div 
-                                class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2 z-20"
+                                class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 border-2 z-20"
                                 :class="[
                                   activeStep === 1 
                                     ? 'bg-primary text-white border-primary shadow-md' 
@@ -712,7 +712,7 @@ function handleCategorySelect(cat) {
                                 <span v-else>1</span>
                               </div>
                               <!-- Line Segment 1 (Connecting to Step 2) -->
-                              <div class="w-0.5 bg-gray-100 absolute left-1/2 -translate-x-1/2 top-8 bottom-[-40px] z-0">
+                              <div class="w-0.5 bg-gray-100 absolute left-1/2 -translate-x-1/2 top-6 sm:top-8 bottom-[-40px] z-0">
                                 <div 
                                   class="w-full bg-primary transition-all duration-500 rounded-full" 
                                   :style="{ height: isCard1Valid ? '100%' : '0%' }"
@@ -731,21 +731,21 @@ function handleCategorySelect(cat) {
                               <!-- 1. Tipo Movimento -->
                               <div class="flex flex-col gap-3">
                                 <div class="flex items-center gap-3">
-                                  <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                    <i class="pi pi-sync text-lg" />
+                                  <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                    <i class="pi pi-sync text-sm sm:text-lg" />
                                   </div>
                                   <span class="text-sm font-semibold text-text">Tipo Movimento</span>
                                 </div>
                                 
                                 <!-- Mobile: Buttons -->
-                                <div class="flex gap-2 md:hidden mt-1">
+                                <div class="flex gap-1.5 md:hidden mt-1">
                                   <button 
                                     v-for="type in movementTypes"
                                     :key="type.id"
                                     type="button" 
                                     @click="() => { setMovementType(type.id); handleStep1Completion(); }"
                                     :class="[
-                                      'flex-1 py-2.5 px-4 rounded-xl border transition-all text-sm font-semibold cursor-pointer flex items-center justify-center gap-2',
+                                      'flex-1 py-2 px-1 rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer flex items-center justify-center gap-1',
                                       form.movementType === type.id 
                                         ? type.id === 'entrata'
                                           ? 'bg-green-50 text-green-700 border-green-200 shadow-sm scale-[1.02]'
@@ -756,7 +756,7 @@ function handleCategorySelect(cat) {
                                     ]"
                                   >
                                     <i :class="[
-                                      'pi text-xs',
+                                      'pi text-[10px] sm:text-xs',
                                       type.id === 'entrata' ? 'pi-arrow-down-left' : type.id === 'uscita' ? 'pi-arrow-up-right' : 'pi-sync'
                                     ]" />
                                     {{ type.label }}
@@ -784,8 +784,8 @@ function handleCategorySelect(cat) {
                               <!-- 2. Categoria -->
                               <div class="flex flex-col gap-3">
                                 <div class="flex items-center gap-3">
-                                  <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                    <i class="pi pi-tag text-lg" />
+                                  <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                    <i class="pi pi-tag text-sm sm:text-lg" />
                                   </div>
                                   <span class="text-sm font-semibold text-text">Categoria</span>
                                 </div>
@@ -795,7 +795,7 @@ function handleCategorySelect(cat) {
                                     v-model="form.category"
                                     itemLabel="nome"
                                     :showColor="true"
-                                    :placeholder="!form.movementType ? 'Seleziona prima il tipo di movimento (Es. Spesa, Entrata, Giroconto)' : 'Seleziona categoria'"
+                                    :placeholder="!form.movementType ? 'Scegli prima il tipo di movimento' : 'Seleziona categoria'"
                                     @select="handleCategorySelect"
                                     @clear="onCategoryClear"
                                     :required="true"
@@ -819,14 +819,14 @@ function handleCategorySelect(cat) {
                               <!-- 3. Importo -->
                               <div class="flex flex-col gap-2">
                                 <div class="flex items-center gap-3">
-                                  <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                    <i class="pi pi-wallet text-lg" />
+                                  <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                    <i class="pi pi-wallet text-sm sm:text-lg" />
                                   </div>
                                   <span class="text-sm font-semibold text-text">Importo</span>
                                 </div>
                                 
-                                <div class="flex items-center gap-3 px-4 py-3.5 border border-gray-200 rounded-xl bg-gray-50/50 focus-within:bg-white focus-within:ring-2 focus-within:ring-primary-light focus-within:border-primary-light transition-all mt-1">
-                                  <span class="text-2xl font-bold text-gray-400 select-none">{{ props.currency }}</span>
+                                <div class="flex items-center gap-3 px-3 py-2.5 sm:px-4 sm:py-3.5 border border-gray-200 rounded-xl bg-gray-50/50 focus-within:bg-white focus-within:ring-2 focus-within:ring-primary-light focus-within:border-primary-light transition-all mt-1">
+                                  <span class="text-xl sm:text-2xl font-bold text-gray-400 select-none">{{ props.currency }}</span>
                                   <input
                                     ref="amountInputRef"
                                     type="text"
@@ -841,7 +841,7 @@ function handleCategorySelect(cat) {
                                     data-1p-ignore="true"
                                     data-lpignore="true"
                                     :class="[
-                                      'w-full text-3xl font-bold bg-transparent border-none outline-none focus:ring-0 focus:outline-none p-0 text-text transition-all',
+                                      'w-full text-2xl sm:text-3xl font-bold bg-transparent border-none outline-none focus:ring-0 focus:outline-none p-0 text-text transition-all',
                                       { 'text-red-600': form.amount > 10000000 || showZeroError },
                                       { 'animate-shake': shakeAmount }
                                     ]"
@@ -861,13 +861,13 @@ function handleCategorySelect(cat) {
                           </div>
 
                           <!-- STEP 2: Dettagli -->
-                          <div class="flex gap-4 md:gap-6 relative">
+                          <div class="flex gap-3 sm:gap-6 relative">
                             
                             <!-- Left Column: Badge and Timeline Line -->
-                            <div class="flex flex-col items-center relative w-8 flex-shrink-0 z-10">
+                            <div class="flex flex-col items-center relative w-6 sm:w-8 flex-shrink-0 z-10">
                               <!-- Badge -->
                               <div 
-                                class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2 z-20"
+                                class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 border-2 z-20"
                                 :class="[
                                   activeStep === 2 
                                     ? 'bg-primary text-white border-primary shadow-md' 
@@ -880,7 +880,7 @@ function handleCategorySelect(cat) {
                                 <span v-else>2</span>
                               </div>
                               <!-- Line Segment 2 (Connecting to Step 3) -->
-                              <div class="w-0.5 bg-gray-100 absolute left-1/2 -translate-x-1/2 top-8 bottom-[-40px] z-0">
+                              <div class="w-0.5 bg-gray-100 absolute left-1/2 -translate-x-1/2 top-6 sm:top-8 bottom-[-40px] z-0">
                                 <div 
                                   class="w-full bg-primary transition-all duration-500 rounded-full" 
                                   :style="{ height: isCard2Valid ? '100%' : '0%' }"
@@ -900,8 +900,8 @@ function handleCategorySelect(cat) {
                               <div class="flex flex-col gap-3">
                                 <div class="flex items-center justify-between">
                                   <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                      <i class="pi pi-pencil text-lg" />
+                                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                      <i class="pi pi-pencil text-sm sm:text-lg" />
                                     </div>
                                     <div class="flex flex-col">
                                       <span class="text-sm font-semibold text-text">Descrizione</span>
@@ -936,8 +936,8 @@ function handleCategorySelect(cat) {
                               <!-- 5. Data -->
                               <div class="flex flex-col gap-3">
                                 <div class="flex items-center gap-3">
-                                  <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                    <i class="pi pi-calendar text-lg" />
+                                  <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                    <i class="pi pi-calendar text-sm sm:text-lg" />
                                   </div>
                                   <div class="flex flex-col">
                                     <span class="text-sm font-semibold text-text">Data</span>
@@ -963,8 +963,8 @@ function handleCategorySelect(cat) {
                               <!-- 6. Conto -->
                               <div class="flex flex-col gap-3">
                                 <div class="flex items-center gap-3">
-                                  <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                    <i class="pi pi-credit-card text-lg" />
+                                  <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                    <i class="pi pi-credit-card text-sm sm:text-lg" />
                                   </div>
                                   <span class="text-sm font-semibold text-text">Conto</span>
                                 </div>
@@ -989,13 +989,13 @@ function handleCategorySelect(cat) {
                           </div>
 
                           <!-- STEP 3: Note -->
-                          <div class="flex gap-4 md:gap-6 relative">
+                          <div class="flex gap-3 sm:gap-6 relative">
                             
                             <!-- Left Column: Badge Only (No Line segment 3) -->
-                            <div class="flex flex-col items-center relative w-8 flex-shrink-0 z-10">
+                            <div class="flex flex-col items-center relative w-6 sm:w-8 flex-shrink-0 z-10">
                               <!-- Badge -->
                               <div 
-                                class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2 z-20"
+                                class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 border-2 z-20"
                                 :class="[
                                   activeStep === 3 
                                     ? 'bg-primary text-white border-primary shadow-md' 
@@ -1015,17 +1015,17 @@ function handleCategorySelect(cat) {
                               <h3 class="text-base font-bold text-text h-8 flex items-center">Informazioni aggiuntive</h3>
                               
                               <div class="flex flex-col gap-3">
-                                <div class="flex items-center justify-between">
-                                  <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                      <i class="pi pi-file text-lg" />
-                                    </div>
+                                  <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                      <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                        <i class="pi pi-file text-sm sm:text-lg" />
+                                      </div>
                                     <div class="flex items-baseline gap-1.5">
                                       <span class="text-sm font-semibold text-text">Note</span>
                                       <span class="text-xs text-gray-400 font-normal">(opzionale)</span>
                                     </div>
                                   </div>
-                                  <span :class="['text-[10px] font-normal transition-colors', form.description.length >= 200 ? 'text-red-500 font-bold' : 'text-gray-400']">
+                                  <span :class="['text-[10px] font-normal transition-colors flex-shrink-0', form.description.length >= 200 ? 'text-red-500 font-bold' : 'text-gray-400']">
                                     {{ form.description.length }}/200
                                   </span>
                                 </div>
